@@ -1,0 +1,47 @@
+'use strict';
+
+const Subscription = require('egg').Subscription;
+const utils = require('../lib/utils');
+
+class UpdateCache extends Subscription {
+  // 通过 schedule 属性来设置定时任务的执行间隔等配置
+  static get schedule() {
+    return {
+      // disable: true,
+      interval: '30s', // 1 分钟间隔
+      immediate: true,
+      type: 'all', // 指定所有的 worker 都需要执行
+    };
+  }
+
+  // subscribe 是真正定时任务执行时被运行的函数
+  async subscribe() {
+
+    console.log(`刷新${this.app.config.config_48.target_name}的房间内容`);
+    const roomMain = await this.app.getRoomMain();
+    const ids = this.app.config.config_48.last_room_content_ids;
+    roomMain.reverse();
+    // console.log('xoxoxoxooxox', roomMain);
+    for (const iterator of roomMain) {
+      // console.log('====', iterator);
+      if (this.app.config.config_48.last_room_content_ids.has(iterator.msgidClient)) continue;
+      // ids.add(iterator.msgidClient);
+      const tmp_array = [ ...(this.app.config.config_48.last_room_content_ids) ];
+      tmp_array.splice(0, 0, iterator.msgidClient);
+      if (tmp_array.length > 10) { tmp_array.splice(-1, 1); }
+
+      this.app.config.config_48.last_room_content_ids = new Set(tmp_array);
+      await this.app.syncDb();
+      console.log('iteriterator', iterator);
+      const msg = utils.dealRoomContent(iterator);
+      console.log('nsg============', msg);
+
+      if (!msg) continue;
+      this.app.socket_qbot.send(this.app.config.config_48.genMsg('send_group_msg', { group_id: this.app.config.group_id, message: msg }));
+      // this.app.socket_qbot.send(this.app.config.config_48.genMsg('send_private_msg', { user_id: this.app.config.qq_number, message: msg }));
+    }
+
+  }
+}
+
+module.exports = UpdateCache;

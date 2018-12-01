@@ -1,0 +1,30 @@
+{
+  "name": "qbot-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "cheerio": "^1.0.0-rc.2",
+    "egg": "^2.14.1",
+    "egg-scripts": "^2.10.0",
+    "egg-socket.io": "^4.1.5",
+    "eslint": "^5.9.0",
+    "iconv-lite": "^0.4.24",
+    "jsonfile": "^5.0.0",
+    "lodash": "^4.17.11",
+    "request": "^2.88.0",
+    "socket.io-client": "^2.1.1",
+    "websocket": "^1.0.28"
+  },
+  "devDependencies": {
+    "egg-bin": "^4.9.0",
+    "eslint-config-egg": "^7.1.0"
+  },
+  "scripts": {
+    "dev": "egg-bin dev --sticky",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
