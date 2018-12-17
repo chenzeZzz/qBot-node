@@ -45,7 +45,7 @@ class WeiboSpider {
 
   async getRemoteLastWeibo() {
     const prefix_url = 'https://weibo.cn';
-    // https://weibo.cn/u/weibo_id?filter=0&page=1
+    // https://weibo.cn/u/6021143413?filter=0&page=1
     const target_url = `https://weibo.cn/u/${this.target_id}?filter=0&page=1`;
     // format cookie<String> into cookie<request.jar>
     // const Cookie = util.parseCookieToRequest(last_cookie);
@@ -72,9 +72,8 @@ class WeiboSpider {
         if (!error && response.statusCode === 200) {
           const data = Iconv.decode(body, 'utf-8').toString();
           // console.log('data===', data);
-          const last_content_id = cheerio.getWeiboContent(data);
-          // util.writeToFile(__dirname + '/test.html', data);
-          res(last_content_id);
+          const weibo_data = cheerio.getWeiboContent(data);
+          res(weibo_data);
         }
       });
     });

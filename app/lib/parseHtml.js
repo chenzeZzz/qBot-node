@@ -10,10 +10,35 @@ module.exports = {
     const slideList = $('.c');
     // 轮播图数据
     const slideListData = [];
+    try {
+      const last_weibo_id = slideList['2'].attribs.id;
+      const target_weibo_content = slideList['2'].children[0].children[0].children;
+      // console.log('slideList====', slideList['2'].children[0].children[0].children);
 
-    const last_weibo_id = slideList['2'].attribs.id;
-    // console.log('slideList====', slideList['2'].attribs.id);
-    return last_weibo_id;
+      let content = '';
+      for (const item of target_weibo_content) {
+
+        switch (item.type) {
+          case 'text':
+            content += `${item.data}`;
+            break;
+          case 'tag':
+            if (item.name === 'br') {
+              content += '\n';
+            }
+            break;
+          default:
+            break;
+        }
+      }
+      return { last_weibo_id, content };
+    } catch (error) {
+      console.log('微博爬虫失败===', error);
+      // TODO 发送给test
+      return error;
+    }
+
+
     /* 轮播图列表信息遍历 */
     // slideList.find('li').each(function(item) {
 

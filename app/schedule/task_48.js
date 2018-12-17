@@ -23,7 +23,9 @@ class UpdateCache extends Subscription {
     roomMain.reverse();
     // console.log('xoxoxoxooxox', roomMain);
     for (const iterator of roomMain) {
-      // console.log('====', iterator);
+      const tmp = JSON.parse(iterator.extInfo);
+      // console.log('====', tmp.senderName);
+      if (tmp.senderName !== this.app.config.config_48.target_name) continue;
       if (this.app.config.config_48.last_room_content_ids.has(iterator.msgidClient)) continue;
       // ids.add(iterator.msgidClient);
       const tmp_array = [ ...(this.app.config.config_48.last_room_content_ids) ];
@@ -32,10 +34,9 @@ class UpdateCache extends Subscription {
 
       this.app.config.config_48.last_room_content_ids = new Set(tmp_array);
       await this.app.syncDb();
-      console.log('iteriterator', iterator);
       const msg = utils.dealRoomContent(iterator);
-      console.log('nsg============', msg);
 
+      // console.log('msg====', msg);
       if (!msg) continue;
       this.app.socket_qbot.send(this.app.config.config_48.genMsg('send_group_msg', { group_id: this.app.config.group_id, message: msg }));
       // this.app.socket_qbot.send(this.app.config.config_48.genMsg('send_private_msg', { user_id: this.app.config.qq_number, message: msg }));

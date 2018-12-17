@@ -13,6 +13,10 @@ module.exports = {
     return socket.getInstance();
   },
 
+  errLog(msg) {
+    this.socket_qbot.send(this.config.config_48.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: msg }));
+  },
+
   initWs() {
     return new Promise(res => {
       const that = this;
@@ -34,11 +38,6 @@ module.exports = {
         console.log('echo-protocol Client Closed');
       };
 
-      client.onmessage = function(e) {
-        if (typeof e.data === 'string') {
-          console.log("Received: '" + e.data + "'");
-        }
-      };
     });
   },
 
@@ -128,14 +127,27 @@ module.exports = {
   },
 
   async isWeiboUpdate() {
-    const result = await weiboSpider.getRemoteLastWeibo();
-    // console.log('xixixixixixix', result);
-    const is_new = result !== this.config.config_48.last_weibo_content_id;
-    if (is_new) {
-      this.config.config_48.last_weibo_content_id = result;
-      await this.syncDb();
+    try {
+      const result = await weiboSpider.getRemoteLastWeibo();
+      const is_new = this.config.config_48.last_weibo_content_id.indexOf(result.last_weibo_id) === -1;
+
+      if (is_new) {
+        this.config.config_48.last_weibo_content_id.push(result.last_weibo_id);
+        await this.syncDb();
+      }
+      result.is_new = is_new;
+      return result;
+    } catch (error) {
+
+      const client = this.getSocket();
+      const config = this.config;
+      client.send(config.config_48.genMsg('send_group_msg', { group_id: config.group_id_test, message: {
+        error,
+        msg: '微博 cookie 需要更换?',
+      } }));
+
     }
-    return is_new;
+
   },
 
   // 同步db 内容到缓存
@@ -161,6 +173,62 @@ module.exports = {
     await jsonfile.writeFileSync(file, obj, { spaces: 2 });
 
     this.config.config_48.last_room_content_ids = new Set(this.config.config_48.last_room_content_ids);
+  },
+
+  async getUserInfo(user_id) {
+    const user_info = await axios({
+      method: 'GET',
+      // url: 'http://localhost:5700/get_stranger_info',
+      url: `http://localhost:5700/get_stranger_info?user_id=${user_id}&no_cahce=false`,
+    });
+
+    return user_info;
+  },
+
+  async getEvent() {
+    const client = this.getSocket();
+    const config = this.config;
+    const that = this;
+    try {
+      client.onmessage = async function(e) {
+        if (typeof e.data === 'string') {
+          // console.log("Received from coolq: '" + e.data + "'");
+          const event_data = JSON.parse(e.data);
+
+          if (event_data && event_data.notice_type && event_data.notice_type === 'group_increase' && event_data.group_id && event_data.group_id === config.group_id) {
+            console.log('=====event_data=====', event_data);
+
+            // 欢迎加入SNH48-吕一应援群~
+
+            // 微博：@SNH48-吕一 ：http://weibo.com/u/6021143413
+            // B站：臭脚番茄 ：http://space.bilibili.com/11399736
+            // 找应援会：
+            // 微博：http://weibo.com/u/5742612817
+            // B站 : https://space.bilibili.com/57253753
+            // 十一月日常应援现火热进行中：https://m.modian.com/project/37894.html?nostatic=1&_wv=1031
+
+            // const user_info = await that.getUserInfo(event_data.user_id);
+            // const _user_info = user_info.data.data;
+            // if (!_user_info || !_user_info.nickname) return;
+
+            const msg =
+              `欢迎 [CQ:at,qq=${event_data.user_id}] 加入SNH48-吕一应援群~ \n` +
+              '找吕一： \n' +
+              '微博：@SNH48-吕一 ：http://weibo.com/u/6021143413 \n' +
+              'B站：臭脚番茄 ：http://space.bilibili.com/11399736 \n' +
+              '找应援会： \n' +
+              '微博：http://weibo.com/u/5742612817 \n' +
+              'B站 : https://space.bilibili.com/57253753 \n' +
+              '十二月日常应援现火热进行中：http://mourl.cc/CBamdccm \n';
+
+            client.send(config.config_48.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
+          }
+        }
+      };
+    } catch (error) {
+      this.errLog('长链接获取事件失败======' + error);
+      process.exit(0);
+    }
   },
 
 

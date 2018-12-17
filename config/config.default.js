@@ -33,9 +33,10 @@ module.exports = appInfo => {
 
       },
     },
-    group_id: '', // 正式 群
-    group_id_test: '', // 调试48 群
-    qq_number: '', // 调试48 群
+
+    group_id_test: 947218914, // 调试48 群
+    group_id: 947218914, // 正式群
+    qq_number: 836851807, // 调试48 群
 
 
     config_48: {
@@ -52,7 +53,7 @@ module.exports = appInfo => {
       },
 
       imei: '',
-      token: '',
+      token: 'jTEA76rYFmdKA4KSCePzkQccRLxMbx4/JVQ91B23tN+XLT8x1ZU8X0w4GnP0eKggOY4eAF9ifbM=',
       // 48通用headers
       headers: (imei, token) => {
         return {
@@ -73,12 +74,12 @@ module.exports = appInfo => {
           }
         );
       },
-      target_name: '',
-      roomId: '',
+      target_name: '吕一',
+      roomId: 5758972,
       // target_name: '大王',
       // roomId: 5774517, // 袋王
-      account: '',
-      password: '',
+      account: 13023501760,
+      password: 'zhiaionly13',
       // last_room_content_ids: new Set([
 
       //   'e2ef3df0-8184-46fd-88ff-5c1f94c79840',
@@ -93,7 +94,7 @@ module.exports = appInfo => {
       //   'e75927a3-dcd5-4336-bb8c-35361034f788',
 
       // ]),
-      weiboId: '', // 目标人微博id
+      weiboId: 6021143413, // 目标人微博id
 
       // last_weibo_content_id: 'M_H4EElCyAK', //最新微博的 id
     },

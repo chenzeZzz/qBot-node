@@ -10,7 +10,7 @@ class UpdateCache extends Subscription {
     return {
       // disable: true,
       interval: '5m', // 1 分钟间隔
-      immediate: false,
+      immediate: true,
       type: 'all', // 指定所有的 worker 都需要执行
     };
   }
@@ -18,34 +18,32 @@ class UpdateCache extends Subscription {
   // subscribe 是真正定时任务执行时被运行的函数
   async subscribe() {
 
-    console.log(`刷新${this.app.config.config_48.target_name}的微博内容`);
-    const is_new = await this.app.isWeiboUpdate();
-    if (!is_new) return;
+    const target_name = this.app.config.config_48.target_name;
+    console.log(`刷新${target_name}的微博内容`);
+    const result = await this.app.isWeiboUpdate();
+    if (result && result.is_new) {
+      const msg = [
+        {
+          type: 'text',
+          data: { text: `你们的小可爱${target_name}发微博啦\n` },
+        },
+        {
+          type: 'text',
+          data: { text: result.content },
+        },
+        {
+          type: 'text',
+          data: { text: '\n' },
+        },
+        {
+          type: 'text',
+          data: { text: `微博链接:\n【https://m.weibo.cn/status/${result.last_weibo_id.substr(2)}】` },
+        },
+      ];
+      this.app.socket_qbot.send(this.app.config.config_48.genMsg('send_group_msg', { group_id: this.app.config.group_id, message: msg }));
+      // this.app.socket_qbot.send(this.app.config.config_48.genMsg('send_private_msg', { user_id: this.app.config.qq_number, message: msg }));
+    }
 
-    const msg = [
-      {
-        type: 'text',
-        data: { text: `是否为最新微博: ${is_new}\n` },
-      },
-      {
-        type: 'face',
-        data: { id: '111' },
-      },
-      {
-        type: 'face',
-        data: { id: '123' },
-      },
-      {
-        type: 'text',
-        data: { text: '\n' },
-      },
-      {
-        type: 'text',
-        data: { text: `微博链接:\n【https://weibo.com/u/${this.app.config.config_48.weiboId}?is_hot=1】` },
-      },
-    ];
-    this.app.socket_qbot.send(this.app.config.config_48.genMsg('send_group_msg', { group_id: this.app.config.group_id, message: msg }));
-    // this.app.socket_qbot.send(this.app.config.config_48.genMsg('send_private_msg', { user_id: this.app.config.qq_number, message: msg }));
   }
 }
 

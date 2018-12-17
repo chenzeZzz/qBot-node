@@ -8,7 +8,11 @@ module.exports = {
       content = '';
 
     switch (iterator.extInfo.messageObject) {
-      case 'text', 'messageBoard':
+      case 'text':
+        type = '发言';
+        content = `【${iterator.extInfo.text}】`;
+        break;
+      case 'messageBoard':
         type = '发言';
         content = `【${iterator.extInfo.text}】`;
         break;
@@ -40,7 +44,7 @@ module.exports = {
     // );
 
     const msg =
-        "平台: 'pocket48' \n" +
+        "平台: '口袋48' \n" +
         `发送人: ${iterator.extInfo.senderName} \n` +
         `时间: ${iterator.msgTimeStr} \n` +
         `类型: ${type} \n` +
