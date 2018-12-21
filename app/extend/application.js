@@ -4,7 +4,8 @@ const socket = require('../lib/socket_instance');
 const axios = require('axios');
 const weiboSpider = require('../lib/weiboSpider').getWeiboSpiderInstance();
 const jsonfile = require('jsonfile');
-const _ = require('lodash');
+const md5 = require('blueimp-md5');
+const request = require('request');
 
 
 // 扩展一些框架便利的方法
@@ -14,7 +15,7 @@ module.exports = {
   },
 
   errLog(msg) {
-    this.socket_qbot.send(this.config.config_48.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: msg }));
+    this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: msg }));
   },
 
   initWs() {
@@ -77,47 +78,38 @@ module.exports = {
   },
 
   async getToken() {
-    return this.config.config_48.token ? this.config.config_48.token : (await this.login_48()).token;
+    return this.config.config_db.token ? this.config.config_db.token : (await this.login_48()).token;
   },
 
   async login_48() {
     console.log('denglu one ========');
-    this.config.config_48.imei = this.config.config_48.imei || this.genImei();
+    this.config.config_db.imei = this.config.config_db.imei || this.genImei();
     const result = await axios({
       method: 'POST',
-      url: this.config.config_48.api.login,
-      headers: this.config.config_48.headers(this.config.config_48.imei, this.config.config_48.token),
+      url: this.config.api_48.login,
+      headers: this.config.headers(this.config.config_db.imei, this.config.config_db.token),
       data: JSON.stringify({
-        account: this.config.config_48.account,
-        password: this.config.config_48.password,
+        account: this.config.account,
+        password: this.config.password,
         longitude: 0,
         latitude: 0,
       }),
     });
-    this.socket_qbot.send(this.config.config_48.genMsg('send_group_msg', { group_id: 947218914, message: `获取 48 token: ${result.data.content.token}` }));
+    this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: 947218914, message: `获取 48 token: ${result.data.content.token}` }));
 
     return result.data.content;
   },
 
-  // method: 'POST',
-  //           url: c.pocket48.api.roomMain,
-  //           headers: new c.pocket48.headers(),
-  //           data: JSON.stringify({
-  //               "roomId": data.roomId,
-  //               "chatType": 0,
-  //               "lastTime": data.lastTime,
-  //               "limit": data.limit,
-  //           }),
   async getRoomMain() {
     const token = await this.getToken();
-    this.config.config_48.imei = this.config.config_48.imei || this.genImei();
+    this.config.config_db.imei = this.config.config_db.imei || this.genImei();
 
     const result = await axios({
       method: 'POST',
-      url: this.config.config_48.api.roomMain,
-      headers: this.config.config_48.headers(this.config.config_48.imei, token),
+      url: this.config.api_48.roomMain,
+      headers: this.config.headers(this.config.config_db.imei, token),
       data: JSON.stringify({
-        roomId: this.config.config_48.roomId,
+        roomId: this.config.roomId,
         chatType: 0,
         lastTime: Date.now(),
         limit: 10,
@@ -128,11 +120,11 @@ module.exports = {
 
   async isWeiboUpdate() {
     try {
-      const result = await weiboSpider.getRemoteLastWeibo();
-      const is_new = this.config.config_48.last_weibo_content_id.indexOf(result.last_weibo_id) === -1;
+      const result = await weiboSpider.getRemoteLastWeibo(this.config.weiboId);
+      const is_new = this.config.config_db.last_weibo_content_id.indexOf(result.last_weibo_id) === -1;
 
       if (is_new) {
-        this.config.config_48.last_weibo_content_id.push(result.last_weibo_id);
+        this.config.config_db.last_weibo_content_id.push(result.last_weibo_id);
         await this.syncDb();
       }
       result.is_new = is_new;
@@ -141,7 +133,7 @@ module.exports = {
 
       const client = this.getSocket();
       const config = this.config;
-      client.send(config.config_48.genMsg('send_group_msg', { group_id: config.group_id_test, message: {
+      client.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: {
         error,
         msg: '微博 cookie 需要更换?',
       } }));
@@ -155,7 +147,7 @@ module.exports = {
     jsonfile.readFile(file)
       .then(obj => {
         obj.last_room_content_ids = new Set(obj.last_room_content_ids);
-        this.config.config_48 = Object.assign(this.config.config_48, obj);
+        this.config.config_db = Object.assign(this.config.config_db, obj);
       })
       .catch(error => console.error('init db config err======', error));
   },
@@ -163,16 +155,14 @@ module.exports = {
   // 写入 db目录持久化
   async syncDb(file) {
     if (!file) file = __dirname + '/../../db/config.json';
-    // const ids = this.config.config_48.last_room_content_ids;
 
-    this.config.config_48.last_room_content_ids = Array.from(this.config.config_48.last_room_content_ids);
-    // const obj = _.pick(this.config, 'config_48');
-    const obj = this.config.config_48;
+    this.config.config_db.last_room_content_ids = Array.from(this.config.config_db.last_room_content_ids);
+    // const obj = _.pick(this.config, 'config_db');
+    const obj = this.config.config_db;
 
-    // console.log('x0x0x0x0x0', obj);
     await jsonfile.writeFileSync(file, obj, { spaces: 2 });
 
-    this.config.config_48.last_room_content_ids = new Set(this.config.config_48.last_room_content_ids);
+    this.config.config_db.last_room_content_ids = new Set(this.config.config_db.last_room_content_ids);
   },
 
   async getUserInfo(user_id) {
@@ -192,12 +182,36 @@ module.exports = {
     try {
       client.onmessage = async function(e) {
         if (typeof e.data === 'string') {
-          // console.log("Received from coolq: '" + e.data + "'");
           const event_data = JSON.parse(e.data);
 
-          if (event_data && event_data.notice_type && event_data.notice_type === 'group_increase' && event_data.group_id && event_data.group_id === config.group_id) {
-            console.log('=====event_data=====', event_data);
+          if (event_data && event_data.message_type && event_data.message_type === 'group' &&
+          event_data.group_id && event_data.group_id === config.group_id &&
+          event_data.message && event_data.message === '集资') {
+            try {
+              const form = {
+                pro_id: that.config.modian_id,
+              };
+              let data = await that.getModianDetail(form, that.config.modian_detail_url);
+              data = data[0];
+              const msg =
+                `${data.pro_name} \n` +
+                `完成金额: ${data.already_raised} \n` +
+                `目标金额: ${data.goal} \n` +
+                `支持人数: ${data.backer_count} \n` +
+                `截止时间: ${data.end_time} \n` +
+                `${data.left_time} \n` +
+                '\n' +
+                '集资链接:\n' +
+                `${that.config.target_site} \n`;
 
+              client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
+            } catch (error) {
+              console.log('查询集资报错===', error);
+              return;
+            }
+          }
+
+          if (event_data && event_data.notice_type && event_data.notice_type === 'group_increase' && event_data.group_id && event_data.group_id === config.group_id) {
             // 欢迎加入SNH48-吕一应援群~
 
             // 微博：@SNH48-吕一 ：http://weibo.com/u/6021143413
@@ -221,7 +235,7 @@ module.exports = {
               'B站 : https://space.bilibili.com/57253753 \n' +
               '十二月日常应援现火热进行中：http://mourl.cc/CBamdccm \n';
 
-            client.send(config.config_48.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
+            client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
           }
         }
       };
@@ -229,6 +243,46 @@ module.exports = {
       this.errLog('长链接获取事件失败======' + error);
       process.exit(0);
     }
+  },
+
+  getModianDetail(form, url) {
+    return new Promise((res, rej) => {
+      form.sign = this.signModianForm(form);
+
+      request.post({
+        url,
+        form,
+        headers: this.config.modian_headers,
+      }, (err, response, body) => {
+        if (err) {
+          console.log('err in task modian===', err);
+          return;
+        }
+        body = JSON.parse(body);
+        if (body.status === '0') {
+          return res(body.data);
+        }
+        rej(body);
+
+      });
+    });
+  },
+
+  signModianForm(form) {
+    // 将键名取出按照升序排列，拼接成query string。 需要encode
+    form = Reflect.ownKeys(form).sort((a, b) => {
+      if (a < b) {
+        return -1;
+      } else if (a > b) {
+        return 1;
+      }
+
+      return 0;
+    }).map(key => `${key}=${encodeURIComponent(form[key])}`)
+      .join('&');
+
+    // 将qs 加上&p=das41aq6计算md5(16), 从第6位开始取16位
+    return md5(form.concat('&p=das41aq6')).substr(5, 16);
   },
 
 
