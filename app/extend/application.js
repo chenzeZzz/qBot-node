@@ -112,7 +112,7 @@ module.exports = {
         roomId: this.config.roomId,
         chatType: 0,
         lastTime: Date.now(),
-        limit: 10,
+        limit: 20,
       }),
     });
     return result.data.content.data;

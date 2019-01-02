@@ -45,7 +45,8 @@ module.exports = appInfo => {
 
 
     group_id_test: 947218914, // 调试48 群
-    group_id: 947218914, // 正式群
+    group_id: 947218914, // 测试群
+    // group_id: 511716523, // 正式群
     qq_number: 836851807, // 调试48 群
 
     target_name: '吕一',

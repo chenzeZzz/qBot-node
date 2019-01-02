@@ -13,6 +13,10 @@ module.exports = {
     try {
       const last_weibo_id = slideList['2'].attribs.id;
       const target_weibo_content = slideList['2'].children[0].children[0].children;
+      // console.log('xixixiixxi', slideList['1'].children[0].children[3]);
+
+      // const last_weibo_id = slideList['1'].attribs.id;
+      // const target_weibo_content = slideList['1'].children[0].children[3].children;
       // console.log('slideList====', slideList['2'].children[0].children[0].children);
 
       let content = '';

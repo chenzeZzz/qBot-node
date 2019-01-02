@@ -29,7 +29,7 @@ class UpdateCache extends Subscription {
       // ids.add(iterator.msgidClient);
       const tmp_array = [ ...(this.app.config.config_db.last_room_content_ids) ];
       tmp_array.splice(0, 0, iterator.msgidClient);
-      if (tmp_array.length > 10) { tmp_array.splice(-1, 1); }
+      if (tmp_array.length > 20) { tmp_array.splice(-1, 1); }
 
       this.app.config.config_db.last_room_content_ids = new Set(tmp_array);
       await this.app.syncDb();
