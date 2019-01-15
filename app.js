@@ -32,11 +32,19 @@ module.exports = app => {
 
   });
 
-  const consoleLog = console.log;
-
+  // 日志持久化
   console.log = function(...args) {
-    consoleLog.apply(app.logger, args);
+    app.logger.info.apply(app.logger, args);
   };
+
+  console.warn = function(...args) {
+    app.logger.warn.apply(app.logger, args);
+  };
+
+  console.error = function(...args) {
+    app.logger.error.apply(app.logger, args);
+  };
+
 
   app = Object.assign(app, util);
 

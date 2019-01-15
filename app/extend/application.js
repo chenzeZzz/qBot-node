@@ -115,6 +115,12 @@ module.exports = {
         limit: 20,
       }),
     });
+    if (result.data.status === 401 && result.data.message && result.data.message.indexOf('过期') > -1) {
+      this.socket_qbot.send(this.config.genMsg('send_private_msg', { user_id: this.config.qq_number, message: '48 账号过期' }));
+      this.config.config_db.token = (await this.login_48()).token;
+      await this.syncDb();
+      return await this.getRoomMain();
+    }
     return result.data.content.data;
   },
 
