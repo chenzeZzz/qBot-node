@@ -44,8 +44,8 @@ module.exports = appInfo => {
     },
 
 
-    group_id_test: 947218914, // 调试48 群
-    group_id: 947218914, // 测试群
+    group_id_test: 764676099, // 调试48 群
+    group_id: 764676099, // 测试群
     // group_id: 511716523, // 正式群
     qq_number: 836851807, // 调试48 群
 
@@ -64,10 +64,11 @@ module.exports = appInfo => {
       liveOpen: 'https://plive.48.cn/livesystem/api/live/v1/openLivePage',
       liveInfo: 'https://plive.48.cn/livesystem/api/live/v1/getLiveOne',
       login: 'https://puser.48.cn/usersystem/api/user/v1/login/phone',
-      roomId: 'https://pjuju.48.cn/imsystem/api/im/room/v1/login/user/list',
+      roomUsers: 'https://pjuju.48.cn/imsystem/api/im/room/v1/login/user/list',
       roomMain: 'https://pjuju.48.cn/imsystem/api/im/v1/member/room/message/mainpage',
       roomBoard: 'https://pjuju.48.cn/imsystem/api/im/v1/member/room/message/boardpage',
       flip: 'https://ppayqa.48.cn/idolanswersystem/api/idolanswer/v1/question_answer/detail',
+      getUserInfo: 'https://puser.48.cn/usersystem/api/user/v1/show/info/', // https://puser.48.cn/usersystem/api/user/v1/show/info/123456
     },
     // 48通用headers
     headers: (imei, token) => {

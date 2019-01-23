@@ -95,7 +95,7 @@ module.exports = {
         latitude: 0,
       }),
     });
-    this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: 947218914, message: `获取 48 token: ${result.data.content.token}` }));
+    this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: `获取 48 token: ${result.data.content.token}` }));
 
     return result.data.content;
   },

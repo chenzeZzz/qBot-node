@@ -17,7 +17,8 @@ module.exports = {
         content = `【${iterator.extInfo.text}】`;
         break;
       case 'faipaiText':
-        type = `回复【${iterator.extInfo.faipaiName}】的留言【${iterator.extInfo.faipaiContent}】`;
+        // type = `回复【${iterator.extInfo.faipaiName}】的留言【${iterator.extInfo.faipaiContent}】`; // "faipaiUserId":666073
+        type = `回复留言【${iterator.extInfo.faipaiContent}】`;
         content = `【${iterator.extInfo.messageText}】`;
         break;
       case 'idolFlip':
