@@ -1,12 +1,9 @@
-'use strict'
-;
+'use strict';
 
-const axios = require('axios');
 const request = require('request');
 const Iconv = require('iconv-lite');
 
 const last_cookie = require('../../db/weiboCookie.json').cookie;
-const util = require('./utils');
 const cheerio = require('./parseHtml');
 
 
@@ -37,10 +34,6 @@ class WeiboSpider {
     if (this.instance) return this.instance;
     this.instance = new WeiboSpider(target_id);
     return this.instance;
-  }
-
-  async getLocalLastWeibo() {
-
   }
 
   async getRemoteLastWeibo() {
@@ -77,29 +70,7 @@ class WeiboSpider {
         }
       });
     });
-    // const result = await request({
-
-    // });
-    // console.log('result======',result);
-
-
-    // return result.data;
   }
-
-  syncLastWeibo() {
-
-  }
-
-  getWeiboCookie() {
-    try {
-      const cookieJson = util.parseCookieToJson(last_cookie);
-      return cookieJson;
-    } catch (error) {
-      console.log('解析 cookie 错误===', error);
-      process.exit(0);
-    }
-  }
-
 
 }
 

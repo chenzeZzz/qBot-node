@@ -20,4 +20,5 @@ test.js
 README.MD
 db/
 py/
+.env
 docker-compose.yml

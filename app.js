@@ -1,6 +1,5 @@
 'use strict';
 const axios = require('axios');
-const util = require('./app/lib/utils');
 
 module.exports = app => {
   app.beforeStart(async function() {
@@ -44,10 +43,6 @@ module.exports = app => {
   console.error = function(...args) {
     app.logger.error.apply(app.logger, args);
   };
-
-
-  app = Object.assign(app, util);
-
 
   const file = __dirname + '/db/config.json';
   app.initDbConfig(file);
