@@ -53,7 +53,7 @@ module.exports = appInfo => {
     roomId: 5758972,
     // target_name: '大王',
     // roomId: 5774517, // 袋王
-    account: 13023501760,
+    account: 13776696206,
     password: 'zhiaionly13',
 
 
