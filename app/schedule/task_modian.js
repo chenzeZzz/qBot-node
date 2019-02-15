@@ -25,6 +25,7 @@ class UpdateCache extends Subscription {
       type: 1,
     };
     const order_list = await this.app.getModianDetail(form, this.app.config.modian_order_url);
+    console.log('order_list');
     if (!order_list || order_list.length < 1) return;
     const modian_user_list = this.app.config.config_db.modian_user_list;
     for (const iterator of order_list) {

@@ -89,6 +89,10 @@ class UpdateCache extends Subscription {
         // content = '[' + JSON.parse(iterator.bodys).url + '][qq 浏览器白名单会拦截]';
         content = '请打开 packet48 查看';
         break;
+      case 'live':
+        type = '直播信息';
+        content = `${iterator.bodys}`; // 正在直播
+        break;
       default:
         return false;
     }

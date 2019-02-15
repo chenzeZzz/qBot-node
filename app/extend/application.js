@@ -239,7 +239,7 @@ module.exports = {
               '找应援会： \n' +
               '微博：http://weibo.com/u/5742612817 \n' +
               'B站 : https://space.bilibili.com/57253753 \n' +
-              '十二月日常应援现火热进行中：http://mourl.cc/CBamdccm \n';
+              '二月日常应援现火热进行中：http://mourl.cc/VIzYi9ds \n';
 
             client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
           }

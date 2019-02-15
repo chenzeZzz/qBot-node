@@ -20,6 +20,13 @@ class UpdateCache extends Subscription {
     console.log(`刷新${target_name}的微博内容`);
     const result = await this.app.isWeiboUpdate();
     if (result && result.is_new) {
+      let weiboUrl = '';
+      try {
+        result.last_weibo_id.substr(2);
+        weiboUrl = `https://m.weibo.cn/status/${result.last_weibo_id.substr(2)}`;
+      } catch (error) {
+        weiboUrl = '请打开微博查看';
+      }
       const msg = [
         {
           type: 'text',
@@ -35,7 +42,7 @@ class UpdateCache extends Subscription {
         },
         {
           type: 'text',
-          data: { text: `微博链接:\n【https://m.weibo.cn/status/${result.last_weibo_id.substr(2)}】` },
+          data: { text: `微博链接:\n【${weiboUrl}】` },
         },
       ];
       this.app.socket_qbot.send(this.app.config.genMsg('send_group_msg', { group_id: this.app.config.group_id, message: msg }));

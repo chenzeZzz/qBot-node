@@ -45,8 +45,8 @@ module.exports = appInfo => {
 
 
     group_id_test: 764676099, // 调试48 群
-    group_id: 764676099, // 测试群
-    // group_id: 511716523, // 正式群
+    // group_id: 764676099, // 测试群
+    group_id: 511716523, // 正式群
     qq_number: 836851807, // 调试48 群
 
     target_name: '吕一',
@@ -84,8 +84,8 @@ module.exports = appInfo => {
 
 
     // modian info
-    modian_id: '41903',
-    target_site: 'https://zhongchou.modian.com/item/41903',
+    modian_id: '49045',
+    target_site: 'https://zhongchou.modian.com/item/49045',
     modian_detail_url: 'https://wds.modian.com/api/project/detail',
     modian_order_url: 'https://wds.modian.com/api/project/orders',
     modian_juju_url: 'https://wds.modian.com/api/project/rankings',
