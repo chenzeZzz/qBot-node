@@ -268,8 +268,7 @@ module.exports = {
         if (body.status === '0') {
           return res(body.data);
         }
-        rej(body);
-
+        return null;
       });
     });
   },
