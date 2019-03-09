@@ -23,8 +23,10 @@ class UpdateCache extends Subscription {
     // console.log('xoxoxoxooxox', roomMain);
     for (const iterator of roomMain) {
       const tmp = JSON.parse(iterator.extInfo);
-      // console.log('====', tmp.senderName);
-      if (tmp.senderId !== this.app.config.packetId) continue;
+      // 这个地方类型有的 string 有的number
+      // console.log('====', tmp.senderId);
+      // console.log('====', typeof tmp.senderId);
+      if (tmp.senderId != this.app.config.packetId) continue;
       if (this.app.config.config_db.last_room_content_ids.has(iterator.msgidClient)) continue;
       // ids.add(iterator.msgidClient);
       const tmp_array = [ ...(this.app.config.config_db.last_room_content_ids) ];
