@@ -51,6 +51,7 @@ module.exports = appInfo => {
 
     target_name: '吕一',
     roomId: 5758972,
+    packetId: '399631',
     // target_name: '大王',
     // roomId: 5774517, // 袋王
     account: 13776696206,

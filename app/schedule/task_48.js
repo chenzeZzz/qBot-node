@@ -24,7 +24,7 @@ class UpdateCache extends Subscription {
     for (const iterator of roomMain) {
       const tmp = JSON.parse(iterator.extInfo);
       // console.log('====', tmp.senderName);
-      if (tmp.senderName !== this.app.config.target_name) continue;
+      if (tmp.senderId !== this.app.config.packetId) continue;
       if (this.app.config.config_db.last_room_content_ids.has(iterator.msgidClient)) continue;
       // ids.add(iterator.msgidClient);
       const tmp_array = [ ...(this.app.config.config_db.last_room_content_ids) ];
