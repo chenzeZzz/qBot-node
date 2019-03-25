@@ -15,6 +15,7 @@ module.exports = {
   },
 
   errLog(msg) {
+    console.error(msg);
     this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: msg }));
   },
 
@@ -192,29 +193,76 @@ module.exports = {
 
           if (event_data && event_data.message_type && event_data.message_type === 'group' &&
           event_data.group_id && event_data.group_id === config.group_id &&
-          event_data.message && event_data.message === '集资') {
-            try {
-              const form = {
-                pro_id: that.config.modian_id,
-              };
-              let data = await that.getModianDetail(form, that.config.modian_detail_url);
-              data = data[0];
-              const msg =
-                `${data.pro_name} \n` +
-                `完成金额: ${data.already_raised} \n` +
-                `目标金额: ${data.goal} \n` +
-                `支持人数: ${data.backer_count} \n` +
-                `截止时间: ${data.end_time} \n` +
-                `${data.left_time} \n` +
-                '\n' +
-                '集资链接:\n' +
-                `${that.config.target_site} \n`;
+          event_data.message) {
+            switch (event_data.message) {
+              case '集资':
+                try {
+                  const form = {
+                    pro_id: that.config.modian_id,
+                  };
+                  let data = await that.getModianDetail(form, that.config.modian_detail_url);
+                  data = data[0];
+                  const msg =
+                  `${data.pro_name} \n` +
+                  `完成金额: ${data.already_raised} \n` +
+                  `目标金额: ${data.goal} \n` +
+                  `支持人数: ${data.backer_count} \n` +
+                  `截止时间: ${data.end_time} \n` +
+                  `${data.left_time} \n` +
+                  '\n' +
+                  '集资链接:\n' +
+                  `${that.config.target_site} \n`;
 
-              client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
-            } catch (error) {
-              console.log('查询集资报错===', error);
-              return;
+                  client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
+                } catch (error) {
+                  that.errLog('获取集资信息失败======' + error);
+                  return;
+                }
+                break;
+              case '微博':
+                try {
+                  const result = await that.isWeiboUpdate();
+                  if (result) {
+                    let weiboUrl = '';
+                    try {
+                      result.last_weibo_id.substr(2);
+                      weiboUrl = `https://m.weibo.cn/status/${result.last_weibo_id.substr(2)}`;
+                    } catch (error) {
+                      weiboUrl = '请打开微博查看';
+                    }
+                    const target_name = that.config.target_name;
+                    const msg = [
+                      {
+                        type: 'text',
+                        data: { text: `你们的小可爱${target_name}最新的微博\n` },
+                      },
+                      {
+                        type: 'text',
+                        data: { text: result.content },
+                      },
+                      {
+                        type: 'text',
+                        data: { text: '\n' },
+                      },
+                      {
+                        type: 'text',
+                        data: { text: `微博链接:\n【${weiboUrl}】` },
+                      },
+                    ];
+                    that.socket_qbot.send(that.config.genMsg('send_group_msg', { group_id: that.config.group_id, message: msg }));
+                  } else {
+                    that.errLog('获取微博信息失败======, 没有 result');
+                  }
+                } catch (error) {
+                  that.errLog('获取微博信息失败======' + error);
+                  return;
+                }
+                break;
+
+              default:
+                break;
             }
+
           }
 
           if (event_data && event_data.notice_type && event_data.notice_type === 'group_increase' && event_data.group_id && event_data.group_id === config.group_id) {

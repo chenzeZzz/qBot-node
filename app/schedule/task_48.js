@@ -38,7 +38,7 @@ class UpdateCache extends Subscription {
 
       const msg = await this.dealRoomContent(iterator);
 
-      // console.log('msg====', msg);
+      console.log('msg====', msg);
       if (!msg) continue;
       this.app.socket_qbot.send(this.app.config.genMsg('send_group_msg', { group_id: this.app.config.group_id, message: msg }));
       // this.app.socket_qbot.send(this.app.config.genMsg('send_private_msg', { user_id: this.app.config.qq_number, message: msg }));
