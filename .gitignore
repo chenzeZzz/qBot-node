@@ -25,4 +25,4 @@ py/
 docker-compose.yml
 
 app/lib/socket_instance.js
-config/
+config/config.default.js
