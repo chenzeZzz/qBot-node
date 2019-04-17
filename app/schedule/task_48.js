@@ -20,18 +20,18 @@ class UpdateCache extends Subscription {
     console.log(`刷新${this.app.config.target_name}的房间内容`);
     const roomMain = await this.app.getRoomMain();
     roomMain.reverse();
-    // console.log('xoxoxoxooxox', roomMain);
+    console.log('xoxoxoxooxox', roomMain);
     for (const iterator of roomMain) {
       const tmp = JSON.parse(iterator.extInfo);
       // 这个地方类型有的 string 有的number
       // console.log('====', tmp.senderId);
       // console.log('====', typeof tmp.senderId);
-      if (tmp.senderId != this.app.config.packetId) continue;
+      if (tmp.user.userId != this.app.config.packetId) continue;
       if (this.app.config.config_db.last_room_content_ids.has(iterator.msgidClient)) continue;
       // ids.add(iterator.msgidClient);
       const tmp_array = [ ...(this.app.config.config_db.last_room_content_ids) ];
       tmp_array.splice(0, 0, iterator.msgidClient);
-      if (tmp_array.length > 20) { tmp_array.splice(-1, 1); }
+      if (tmp_array.length > 200) { tmp_array.splice(-1, 1); }
 
       this.app.config.config_db.last_room_content_ids = new Set(tmp_array);
       await this.app.syncDb();
@@ -65,33 +65,32 @@ class UpdateCache extends Subscription {
     let type = '',
       content = '';
 
-    switch (iterator.extInfo.messageObject) {
-      case 'text':
+    switch (iterator.msgType) {
+      case 'TEXT':
         type = '发言';
         content = `【${iterator.extInfo.text}】`;
         break;
-      case 'messageBoard':
+      case 'MESSAGEBOARD':
         type = '发言';
         content = `【${iterator.extInfo.text}】`;
         break;
-      case 'faipaiText':
+      case 'FAIPAITEXT':
         {
           const userName = await this.getUsernameFromjuju(iterator.extInfo.faipaiUserId);
           type = `回复【${userName}】的留言【${iterator.extInfo.faipaiContent}】`; // "faipaiUserId":666073
         }
-
         content = `【${iterator.extInfo.messageText}】`;
         break;
-      case 'idolFlip':
+      case 'IDOLFLIP':
         type = `${iterator.extInfo.idolFlipTitle}`;
         content = `【${iterator.extInfo.idolFlipContent}】`;
         break;
-      case 'image':
+      case 'IMAGE':
         type = '图片';
         // content = '[' + JSON.parse(iterator.bodys).url + '][qq 浏览器白名单会拦截]';
         content = '请打开 packet48 查看';
         break;
-      case 'live':
+      case 'LIVE':
         type = '直播信息';
         content = `${iterator.bodys}`; // 正在直播
         break;
@@ -101,8 +100,8 @@ class UpdateCache extends Subscription {
 
     const msg =
             "平台: '口袋48' \n" +
-            `发送人: ${iterator.extInfo.senderName} \n` +
-            `时间: ${iterator.msgTimeStr} \n` +
+            `发送人: ${iterator.extInfo.user.nickName} \n` +
+            '时间: ' + new Date(iterator.msgTime).toLocaleString().replace(new RegExp('/', 'g'), '-') + '\n' +
             `类型: ${type} \n` +
             '内容:\n' +
             `${content} \n`;

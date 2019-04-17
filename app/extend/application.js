@@ -87,42 +87,51 @@ module.exports = {
     this.config.config_db.imei = this.config.config_db.imei || this.genImei();
     const result = await axios({
       method: 'POST',
-      url: this.config.api_48.login,
-      headers: this.config.headers(this.config.config_db.imei, this.config.config_db.token),
+      url: this.config.api_48_v2.login,
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        appInfo: '{"vendor":"apple","deviceId":"2F82F4FF-4CDA-4A30-8217-1C39E64E57C2","appVersion":"6.0.0","appBuild":"190409","osVersion":"9.3.2","osType":"ios","deviceName":"iPhone SE","os":"ios"}',
+      },
       data: JSON.stringify({
-        account: this.config.account,
-        password: this.config.password,
-        longitude: 0,
-        latitude: 0,
+        pwd: this.config.password,
+        mobile: this.config.account,
       }),
     });
-    this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: `获取 48 token: ${result.data.content.token}` }));
-
-    return result.data.content;
+    if (result.data.status === 200) {
+      this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: `获取 48 token: ${result.data.content.token}` }));
+      return result.data.content;
+    }
+    this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: '获取 48 token 失败:' + JSON.stringify(result.data) }));
   },
 
   async getRoomMain() {
     const token = await this.getToken();
-    this.config.config_db.imei = this.config.config_db.imei || this.genImei();
+    // this.config.config_db.imei = this.config.config_db.imei || this.genImei();
 
     const result = await axios({
       method: 'POST',
-      url: this.config.api_48.roomMain,
-      headers: this.config.headers(this.config.config_db.imei, token),
+      url: this.config.api_48_v2.roomMain,
+      // headers: this.config.headers(this.config.config_db.imei, token),
+      headers: {
+        token,
+        'Content-Type': 'application/json;charset=utf-8',
+      },
       data: JSON.stringify({
+        needTop1Msg: false,
         roomId: this.config.roomId,
-        chatType: 0,
-        lastTime: Date.now(),
-        limit: 20,
+        ownerId: this.config.packetId,
+        nextTime: 0,
       }),
     });
-    if (result.data.status === 401 && result.data.message && result.data.message.indexOf('过期') > -1) {
-      this.socket_qbot.send(this.config.genMsg('send_private_msg', { user_id: this.config.qq_number, message: '48 账号过期' }));
-      this.config.config_db.token = (await this.login_48()).token;
+    if (result.data.status !== 200 && result.data.message && result.data.message.indexOf('token') > -1) {
+      this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: '48 账号过期' }));
+      const newToken = (await this.login_48()).token;
+      if (!newToken) return [];
+      this.config.config_db.token = newToken;
       await this.syncDb();
       return await this.getRoomMain();
     }
-    return result.data.content.data;
+    return result.data.content.message;
   },
 
   async isWeiboUpdate() {
