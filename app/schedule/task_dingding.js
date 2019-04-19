@@ -9,7 +9,7 @@ class UpdateCache extends Subscription {
   static get schedule() {
     return {
       // disable: true,
-      cron: '0 30 16 * * 1-5',
+      cron: '0 18 17 * * 1-5',
       immediate: false,
       type: 'all', // 指定所有的 worker 都需要执行
     };
