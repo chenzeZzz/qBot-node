@@ -221,7 +221,7 @@ module.exports = {
                   `${data.left_time} \n` +
                   '\n' +
                   '生日集资链接:\n' +
-                  `${that.config.target_site}${that.config.modian_id} \n`;
+                  `${that.config.target_site_origin} \n`;
 
                   client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
                 } catch (error) {
@@ -297,7 +297,7 @@ module.exports = {
               '找应援会： \n' +
               '微博：http://weibo.com/u/5742612817 \n' +
               'B站 : https://space.bilibili.com/57253753 \n' +
-              `生日集资连接test：${config.target_site_origin} \n`;
+              `生日集资连接：${config.target_site_origin} \n`;
 
             client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
           }
