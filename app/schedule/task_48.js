@@ -65,7 +65,7 @@ class UpdateCache extends Subscription {
     let type = '',
       content = '';
 
-    switch (iterator.msgType) {
+    switch (iterator.extInfo.messageType) {
       case 'TEXT':
         type = '发言';
         content = `【${iterator.extInfo.text}】`;
@@ -74,23 +74,22 @@ class UpdateCache extends Subscription {
         type = '发言';
         content = `【${iterator.extInfo.text}】`;
         break;
-      case 'FAIPAITEXT':
-        {
-          const userName = await this.getUsernameFromjuju(iterator.extInfo.faipaiUserId);
-          type = `回复【${userName}】的留言【${iterator.extInfo.faipaiContent}】`; // "faipaiUserId":666073
-        }
-        content = `【${iterator.extInfo.messageText}】`;
+      case 'REPLY':
+        type = `回复【${iterator.extInfo.replyName}】的留言【${iterator.extInfo.replyText}】`; // "faipaiUserId":666073
+        content = `【${iterator.extInfo.text}】`;
         break;
-      case 'IDOLFLIP':
-        type = `${iterator.extInfo.idolFlipTitle}`;
-        content = `【${iterator.extInfo.idolFlipContent}】`;
+      case 'FLIPCARD':
+        // type = `${iterator.extInfo.idolFlipTitle}`;
+        // content = `【${iterator.extInfo.idolFlipContent}】`;
+        type = '未知';
+        content = '翻牌';
         break;
       case 'IMAGE':
         type = '图片';
         // content = '[' + JSON.parse(iterator.bodys).url + '][qq 浏览器白名单会拦截]';
         content = '请打开 packet48 查看';
         break;
-      case 'LIVE':
+      case 'LIVEPUSH':
         type = '直播信息';
         content = `${iterator.bodys}`; // 正在直播
         break;

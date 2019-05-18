@@ -123,7 +123,7 @@ module.exports = {
         nextTime: 0,
       }),
     });
-    if (result.data.status !== 200 && result.data.message && result.data.message.indexOf('token') > -1) {
+    if (result.data.status !== 200 && result.data.message && (result.data.message.indexOf('token') > -1 || result.data.message.indexOf('非法授权') > -1)) {
       this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: '48 账号过期' }));
       const newToken = (await this.login_48()).token;
       if (!newToken) return [];
@@ -137,6 +137,7 @@ module.exports = {
   async isWeiboUpdate() {
     try {
       const result = await weiboSpider.getRemoteLastWeibo(this.config.weiboId);
+      if (!result || !result.last_weibo_id) return;
       const is_new = this.config.config_db.last_weibo_content_id.indexOf(result.last_weibo_id) === -1;
 
       if (is_new) {
@@ -219,8 +220,8 @@ module.exports = {
                   `截止时间: ${data.end_time} \n` +
                   `${data.left_time} \n` +
                   '\n' +
-                  '集资链接:\n' +
-                  `${that.config.target_site} \n`;
+                  '生日集资链接:\n' +
+                  `${that.config.target_site}${that.config.modian_id} \n`;
 
                   client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
                 } catch (error) {
@@ -296,7 +297,7 @@ module.exports = {
               '找应援会： \n' +
               '微博：http://weibo.com/u/5742612817 \n' +
               'B站 : https://space.bilibili.com/57253753 \n' +
-              '二月日常应援现火热进行中：http://mourl.cc/VIzYi9ds \n';
+              '生日集资连接：http://mourl.cc/oBaMBx-m \n';
 
             client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
           }
