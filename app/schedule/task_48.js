@@ -20,7 +20,7 @@ class UpdateCache extends Subscription {
     console.log(`刷新${this.app.config.target_name}的房间内容`);
     const roomMain = await this.app.getRoomMain();
     roomMain.reverse();
-    console.log('xoxoxoxooxox', roomMain);
+    // console.log('xoxoxoxooxox', roomMain);
     for (const iterator of roomMain) {
       const tmp = JSON.parse(iterator.extInfo);
       // 这个地方类型有的 string 有的number

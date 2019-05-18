@@ -41,10 +41,10 @@ class UpdateCache extends Subscription {
 
       const msg =
         `感谢 ${iterator.nickname} 刚刚在${donate_detail.pro_name}中支持了：${iterator.backer_money}元！ \n` +
-        `${this.app.config.target_site}${this.app.config.modian_id} \n` +
         `已筹￥: ${donate_detail.already_raised} \n` +
-        `距离目标￥: ${donate_detail.goal} 还有 ${Number(donate_detail.goal) - Number(donate_detail.already_raised)}\n`;
-
+        `距离目标￥: ${donate_detail.goal} 还有 ${Number(donate_detail.goal) - Number(donate_detail.already_raised)}\n` +
+        `集资链接: ${this.app.config.target_site_origin}` +
+        '输入 `集资` 查看详情';
       this.app.socket_qbot.send(this.app.config.genMsg('send_group_msg', { group_id: this.app.config.group_id, message: msg }));
     }
     await this.app.syncDb();
