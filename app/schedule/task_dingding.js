@@ -18,6 +18,7 @@ class UpdateCache extends Subscription {
 
   // subscribe 是真正定时任务执行时被运行的函数
   async subscribe() {
+    console.log('dingding 提醒大家点饭!');
     await axios({
       method: 'POST',
       url: 'https://oapi.dingtalk.com/robot/send?access_token=cd7e46a1640295ef335eb7aafd3725f32108a20dab3401747fd65c90a192f99d',
