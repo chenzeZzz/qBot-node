@@ -19,7 +19,9 @@ class UpdateCache extends Subscription {
   async subscribe() {
 
     console.log(`刷新${this.app.config.target_name}的摩点信息`);
-
+    if(!that.config.modian_id){
+      return;
+    }
     const form = {
       pro_id: this.app.config.modian_id,
       type: 1,

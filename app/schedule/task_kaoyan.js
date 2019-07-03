@@ -9,7 +9,7 @@ class UpdateCache extends Subscription {
   static get schedule() {
     return {
       // disable: true,
-      cron: '0 0 9,14,19 * * 1-6',
+      cron: '0 0 9,13,20 * * 2-7',
       immediate: false,
       type: 'worker',
     };

@@ -207,6 +207,10 @@ module.exports = {
             switch (event_data.message) {
               case '集资':
                 try {
+                  if(!that.config.modian_id){
+                    client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: '目前没有集资活动!' }));
+                    break;
+                  }
                   const form = {
                     pro_id: that.config.modian_id,
                   };
@@ -219,9 +223,10 @@ module.exports = {
                   `支持人数: ${data.backer_count} \n` +
                   `截止时间: ${data.end_time} \n` +
                   `${data.left_time} \n` +
-                  '\n' +
-                  '生日集资链接:\n' +
-                  `${that.config.target_site_origin} \n`;
+                  // '\n' +
+                  // '生日集资链接:\n' +
+                  // `${that.config.target_site_origin}` +
+                  `\n`;
 
                   client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
                 } catch (error) {
