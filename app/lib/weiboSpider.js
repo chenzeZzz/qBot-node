@@ -44,7 +44,7 @@ class WeiboSpider {
     // const Cookie = util.parseCookieToRequest(last_cookie);
 
     // 这边有个巨坑, 哎, 你自己踩吧，痛苦后才能永恒！祝福你
-    return new Promise(res => {
+    return new Promise((res, rej) => {
       const jar = request.jar();
       last_cookie.split(';').forEach(x => {
         x = x.trim();
@@ -65,8 +65,12 @@ class WeiboSpider {
         if (!error && response.statusCode === 200) {
           const data = Iconv.decode(body, 'utf-8').toString();
           // console.log('data===', data);
-          const weibo_data = cheerio.getWeiboContent(data);
-          res(weibo_data);
+          try {
+            const weibo_data = cheerio.getWeiboContent(data);
+            res(weibo_data);
+          } catch (error) {
+            rej(error)
+          }
         }
       });
     });

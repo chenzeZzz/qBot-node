@@ -150,11 +150,7 @@ module.exports = {
 
       const client = this.getSocket();
       const config = this.config;
-      client.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: {
-        error,
-        msg: '微博 cookie 需要更换?',
-      } }));
-
+      client.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: '微博 cookie 需要更换?'}));
     }
 
   },
@@ -223,9 +219,9 @@ module.exports = {
                   `支持人数: ${data.backer_count} \n` +
                   `截止时间: ${data.end_time} \n` +
                   `${data.left_time} \n` +
-                  // '\n' +
-                  // '生日集资链接:\n' +
-                  // `${that.config.target_site_origin}` +
+                  '\n' +
+                  '生日集资链接:\n' +
+                  `${that.config.target_site_origin}` +
                   `\n`;
 
                   client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
@@ -302,7 +298,9 @@ module.exports = {
               '找应援会： \n' +
               '微博：http://weibo.com/u/5742612817 \n' +
               'B站 : https://space.bilibili.com/57253753 \n' +
-              `生日集资连接：${config.target_site_origin} \n`;
+              // `生日集资连接：${config.target_site_origin} \n`+
+              '输入 `微博` 查看最新微博详情' +
+              `\n`;
 
             client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
           }
