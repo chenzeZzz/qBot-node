@@ -150,7 +150,7 @@ module.exports = {
 
       const client = this.getSocket();
       const config = this.config;
-      client.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: '微博 cookie 需要更换?'}));
+      client.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: '微博 cookie 需要更换?' }));
     }
 
   },
@@ -203,7 +203,7 @@ module.exports = {
             switch (event_data.message) {
               case '集资':
                 try {
-                  if(!that.config.modian_id){
+                  if (!that.config.modian_id) {
                     client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: '目前没有集资活动!' }));
                     break;
                   }
@@ -222,7 +222,7 @@ module.exports = {
                   '\n' +
                   '生日集资链接:\n' +
                   `${that.config.target_site_origin}` +
-                  `\n`;
+                  '\n';
 
                   client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
                 } catch (error) {
@@ -233,6 +233,7 @@ module.exports = {
               case '微博':
                 try {
                   const result = await that.isWeiboUpdate();
+                  console.log('result===', result);
                   if (result) {
                     let weiboUrl = '';
                     try {
@@ -300,7 +301,7 @@ module.exports = {
               'B站 : https://space.bilibili.com/57253753 \n' +
               // `生日集资连接：${config.target_site_origin} \n`+
               '输入 `微博` 查看最新微博详情' +
-              `\n`;
+              '\n';
 
             client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
           }

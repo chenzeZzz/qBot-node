@@ -39,7 +39,7 @@ module.exports = {
     } catch (error) {
       console.log('微博爬虫失败===', error);
       // TODO 发送给test
-      throw new Error('微博爬虫失败')
+      throw new Error('微博爬虫失败');
     }
 
 

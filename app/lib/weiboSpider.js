@@ -2,8 +2,9 @@
 
 const request = require('request');
 const Iconv = require('iconv-lite');
+const cp = require('child_process');
 
-const last_cookie = require('../../db/weiboCookie.json').cookie;
+let last_cookie = require('../../db/weiboCookie.json').cookie;
 const cheerio = require('./parseHtml');
 
 
@@ -45,34 +46,50 @@ class WeiboSpider {
 
     // 这边有个巨坑, 哎, 你自己踩吧，痛苦后才能永恒！祝福你
     return new Promise((res, rej) => {
-      const jar = request.jar();
-      last_cookie.split(';').forEach(x => {
-        x = x.trim();
-        jar.setCookie(request.cookie(x), prefix_url);
-      });
-      request({
-        encoding: null,
-        method: 'GET',
-        url: target_url,
-        jar,
-        headers: {
-          // cookie: Cookie,
-          // 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
-          // Accept: 'application/json',
-          // 'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }, function(error, response, body) {
-        if (!error && response.statusCode === 200) {
-          const data = Iconv.decode(body, 'utf-8').toString();
-          // console.log('data===', data);
+      // const jar = request.jar();
+      // last_cookie.split(';').forEach(x => {
+      //   x = x.trim();
+      //   jar.setCookie(request.cookie(x), prefix_url);
+      // });
+
+      last_cookie = `Cookie: ${last_cookie}`;
+
+      cp.exec(`curl -X GET 'https://weibo.cn/u/6021143413?filter=0&page=1' -H '${last_cookie}' -H 'pragma: no-cache' -H 'cache-control: no-cache' -H 'upgrade-insecure-requests: 1' -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36' -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3' -H 'accept-language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7'`, (err, stdout, stderr) => {
+      // cp.exec(`curl -H 'Host: weibo.cn' -H '${last_cookie}' -H 'pragma: no-cache' -H 'cache-control: no-cache' -H 'upgrade-insecure-requests: 1' -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36' -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3' -H 'accept-language: en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7' --compressed 'https://weibo.cn/u/6021143413?filter=0&page=1'`, (err, stdout) => {
+        if (!err && stdout) {
+          // const data = Iconv.decode(stdout, 'utf-8').toString();
+          console.log('data===', stdout);
           try {
-            const weibo_data = cheerio.getWeiboContent(data);
+            const weibo_data = cheerio.getWeiboContent(stdout);
             res(weibo_data);
           } catch (error) {
-            rej(error)
+            rej(error);
           }
         }
       });
+      // request({
+      //   encoding: null,
+      //   method: 'GET',
+      //   url: target_url,
+      //   jar,
+      //   headers: {
+      //     // cookie: Cookie,
+      //     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
+      //     accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+      //     // 'Content-Type': 'application/x-www-form-urlencoded',
+      //   },
+      // }, function(error, response, body) {
+      //   if (!error && response.statusCode === 200) {
+      //     const data = Iconv.decode(body, 'utf-8').toString();
+      //     console.log('data===', data);
+      //     try {
+      //       const weibo_data = cheerio.getWeiboContent(data);
+      //       res(weibo_data);
+      //     } catch (error) {
+      //       rej(error);
+      //     }
+      //   }
+      // });
     });
   }
 
