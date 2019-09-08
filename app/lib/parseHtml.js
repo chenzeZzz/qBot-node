@@ -9,7 +9,6 @@ module.exports = {
     // 根据id获取轮播图列表信息
     const slideList = $('.c');
     // 轮播图数据
-    const slideListData = [];
     try {
       const last_weibo_id = slideList['2'].attribs.id;
       const target_weibo_content = slideList['2'].children[0].children[0].children;

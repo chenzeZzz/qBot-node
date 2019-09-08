@@ -8,12 +8,10 @@ const W3CWebSocket = require('websocket').w3cwebsocket;
 class SocketClient {
   constructor() {
     this.client = null;
-    // this.event = null;
-    this.init();
   }
 
-  init() {
-    this.client = new W3CWebSocket('ws://47.99.165.165:6700', undefined, {
+  init(ip) {
+    this.client = new W3CWebSocket(`ws://${ip}:6700`, undefined, {
       fragmentOutgoingMessages: false,
     });
 
@@ -24,9 +22,9 @@ class SocketClient {
     // });
   }
 
-  getInstance() {
+  getInstance(ip) {
+    this.init(ip);
     return this.client;
-    // return [ this.client, this.event ];
   }
 }
 

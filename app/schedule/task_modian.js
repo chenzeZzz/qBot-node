@@ -17,9 +17,10 @@ class UpdateCache extends Subscription {
 
   // subscribe 是真正定时任务执行时被运行的函数
   async subscribe() {
+    const that = this;
 
     console.log(`刷新${this.app.config.target_name}的摩点信息`);
-    if(!that.config.modian_id){
+    if (!that.config.modian_id) {
       return;
     }
     const form = {

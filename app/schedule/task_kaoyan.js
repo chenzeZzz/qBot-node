@@ -1,7 +1,6 @@
 'use strict';
 
 const Subscription = require('egg').Subscription;
-const axios = require('axios');
 
 
 class UpdateCache extends Subscription {

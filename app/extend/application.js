@@ -11,7 +11,7 @@ const request = require('request');
 // 扩展一些框架便利的方法
 module.exports = {
   getSocket() {
-    return socket.getInstance();
+    return socket.getInstance(this.config.wsIp);
   },
 
   errLog(msg) {
@@ -78,61 +78,6 @@ module.exports = {
     return input + '' + last;
   },
 
-  async getToken() {
-    return this.config.config_db.token ? this.config.config_db.token : (await this.login_48()).token;
-  },
-
-  async login_48() {
-    console.log('denglu one ========');
-    this.config.config_db.imei = this.config.config_db.imei || this.genImei();
-    const result = await axios({
-      method: 'POST',
-      url: this.config.api_48_v2.login,
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        appInfo: '{"vendor":"apple","deviceId":"2F82F4FF-4CDA-4A30-8217-1C39E64E57C2","appVersion":"6.0.0","appBuild":"190409","osVersion":"9.3.2","osType":"ios","deviceName":"iPhone SE","os":"ios"}',
-      },
-      data: JSON.stringify({
-        pwd: this.config.password,
-        mobile: this.config.account,
-      }),
-    });
-    if (result.data.status === 200) {
-      this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: `获取 48 token: ${result.data.content.token}` }));
-      return result.data.content;
-    }
-    this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: '获取 48 token 失败:' + JSON.stringify(result.data) }));
-  },
-
-  async getRoomMain() {
-    const token = await this.getToken();
-    // this.config.config_db.imei = this.config.config_db.imei || this.genImei();
-
-    const result = await axios({
-      method: 'POST',
-      url: this.config.api_48_v2.roomMain,
-      // headers: this.config.headers(this.config.config_db.imei, token),
-      headers: {
-        token,
-        'Content-Type': 'application/json;charset=utf-8',
-      },
-      data: JSON.stringify({
-        needTop1Msg: false,
-        roomId: this.config.roomId,
-        ownerId: this.config.packetId,
-        nextTime: 0,
-      }),
-    });
-    if (result.data.status !== 200 && result.data.message && (result.data.message.indexOf('token') > -1 || result.data.message.indexOf('非法授权') > -1)) {
-      this.socket_qbot.send(this.config.genMsg('send_group_msg', { group_id: this.config.group_id_test, message: '48 账号过期' }));
-      const newToken = (await this.login_48()).token;
-      if (!newToken) return [];
-      this.config.config_db.token = newToken;
-      await this.syncDb();
-      return await this.getRoomMain();
-    }
-    return result.data.content.message;
-  },
 
   async isWeiboUpdate() {
     try {
@@ -159,7 +104,6 @@ module.exports = {
   async initDbConfig(file) {
     jsonfile.readFile(file)
       .then(obj => {
-        obj.last_room_content_ids = new Set(obj.last_room_content_ids);
         this.config.config_db = Object.assign(this.config.config_db, obj);
       })
       .catch(error => console.error('init db config err======', error));
@@ -168,14 +112,8 @@ module.exports = {
   // 写入 db目录持久化
   async syncDb(file) {
     if (!file) file = __dirname + '/../../db/config.json';
-
-    this.config.config_db.last_room_content_ids = Array.from(this.config.config_db.last_room_content_ids);
-    // const obj = _.pick(this.config, 'config_db');
     const obj = this.config.config_db;
-
     await jsonfile.writeFileSync(file, obj, { spaces: 2 });
-
-    this.config.config_db.last_room_content_ids = new Set(this.config.config_db.last_room_content_ids);
   },
 
   async getUserInfo(user_id) {
@@ -300,7 +238,7 @@ module.exports = {
               '微博：http://weibo.com/u/5742612817 \n' +
               'B站 : https://space.bilibili.com/57253753 \n' +
               // `生日集资连接：${config.target_site_origin} \n`+
-              '输入 `微博` 查看最新微博详情' +
+              // '输入 `微博` 查看最新微博详情' +
               '\n';
 
             client.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
@@ -314,7 +252,7 @@ module.exports = {
   },
 
   getModianDetail(form, url) {
-    return new Promise((res, rej) => {
+    return new Promise(res => {
       form.sign = this.signModianForm(form);
 
       request.post({
