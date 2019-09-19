@@ -39,6 +39,7 @@ class HttpService extends Service {
     const result = await axios({
       method: 'POST',
       url: this.config.api_48_v2.roomMain,
+      timeout: 5000,
       headers: {
         token,
         'Content-Type': 'application/json;charset=utf-8',
