@@ -18,7 +18,7 @@ module.exports = app => {
       field: 'room_id',
     },
     type: {
-      type: string(36),
+      type: string(11),
     },
     answerTo: {
       type: string(20),

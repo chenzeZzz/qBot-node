@@ -52,18 +52,18 @@ class MessageService extends Service {
     switch (iterator.extInfo.messageType) {
       case 'TEXT':
         message.type = '发言';
-        message.content = `【${iterator.extInfo.text}】`;
+        message.content = `${iterator.extInfo.text}`;
         break;
       case 'MESSAGEBOARD':
         message.type = '发言';
-        message.content = `【${iterator.extInfo.text}】`;
+        message.content = `${iterator.extInfo.text}`;
         break;
       case 'REPLY':
         message.type = '留言';
         message.answerTo = iterator.extInfo.replyName;
         message.question = iterator.extInfo.replyText;
         message.showType = `回复【${iterator.extInfo.replyName}】的留言【${iterator.extInfo.replyText}】`; // "faipaiUserId":666073
-        message.content = `【${iterator.extInfo.text}】`;
+        message.content = `${iterator.extInfo.text}`;
         break;
       case 'FLIPCARD':
         // 获取详细内容
@@ -71,7 +71,7 @@ class MessageService extends Service {
         message.answerTo = await this.ctx.service.http.getAnswerDetail(iterator.extInfo.answerId, iterator.extInfo.questionId);
         message.question = iterator.extInfo.question;
         message.showType = `回复【${message.answerTo}】的翻牌【${iterator.extInfo.question}】`; // "faipaiUserId":666073
-        message.content = `【${iterator.extInfo.answer}】`;
+        message.content = `${iterator.extInfo.answer}`;
 
         break;
       case 'IMAGE':
@@ -95,7 +95,7 @@ class MessageService extends Service {
             '时间: ' + new Date(iterator.msgTime).toLocaleString().replace(new RegExp('/', 'g'), '-') + '\n' +
             `类型: ${message.showType || message.type} \n` +
             '内容:\n' +
-            `${message.content} \n`;
+            `【${message.content}】\n`;
     return msg;
   }
 }

@@ -51,7 +51,7 @@ class HttpService extends Service {
         nextTime: 0,
       }),
     });
-    if (result.data.status !== 200 && result.data.message && (result.data.message.indexOf('token') > -1 || result.data.message.indexOf('非法授权') > -1)) {
+    if (result.data.status !== 200 && result.data.message && (result.data.message.indexOf('登陆') > -1 || result.data.message.indexOf('过期') > -1)) {
       this.app.socket_qbot.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: '48 账号过期' }));
       const newToken = (await this.login_48()).token;
       if (!newToken) return [];
