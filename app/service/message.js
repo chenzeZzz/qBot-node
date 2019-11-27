@@ -77,7 +77,7 @@ class MessageService extends Service {
       case 'IMAGE':
         message.type = '图片';
         // content = '[' + JSON.parse(iterator.bodys).url + '][qq 浏览器白名单会拦截]';
-        message.content = '请打开 packet48 查看';
+        message.content = JSON.parse(iterator.bodys).url;
         break;
       case 'LIVEPUSH':
         message.type = '直播信息';
