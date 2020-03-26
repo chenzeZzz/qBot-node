@@ -2,11 +2,9 @@
 
 const socket = require('../lib/socket_instance');
 const axios = require('axios');
-const weiboSpider = require('../lib/weiboSpider').getWeiboSpiderInstance();
 const jsonfile = require('jsonfile');
 const md5 = require('blueimp-md5');
 const request = require('request');
-
 
 // 扩展一些框架便利的方法
 module.exports = {
@@ -76,28 +74,6 @@ module.exports = {
       last = 10 - last;
     }
     return input + '' + last;
-  },
-
-
-  async isWeiboUpdate() {
-    try {
-      const result = await weiboSpider.getRemoteLastWeibo(this.config.weiboId);
-      if (!result || !result.last_weibo_id) return;
-      const is_new = this.config.config_db.last_weibo_content_id.indexOf(result.last_weibo_id) === -1;
-
-      if (is_new) {
-        this.config.config_db.last_weibo_content_id.push(result.last_weibo_id);
-        await this.syncDb();
-      }
-      result.is_new = is_new;
-      return result;
-    } catch (error) {
-
-      const client = this.getSocket();
-      const config = this.config;
-      client.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: '微博 cookie 需要更换?' }));
-    }
-
   },
 
   // 同步db 内容到缓存

@@ -11,7 +11,7 @@ class UpdateCache extends Subscription {
       disable: true,
       interval: '1m', // 1 分钟间隔
       immediate: true,
-      type: 'all', // 指定所有的 worker 都需要执行
+      type: 'worker', // 指定所有的 worker 都需要执行
     };
   }
 

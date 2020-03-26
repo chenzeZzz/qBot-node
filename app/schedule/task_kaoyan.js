@@ -7,7 +7,7 @@ class UpdateCache extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
-      // disable: true,
+      disable: true,
       cron: '0 0 9,13,20 * * 2-7',
       immediate: false,
       type: 'worker',
@@ -17,7 +17,7 @@ class UpdateCache extends Subscription {
   // subscribe 是真正定时任务执行时被运行的函数
   async subscribe() {
     console.log('考研倒计时!!!');
-    const timedate = new Date('12,23,2019');
+    const timedate = new Date('12,23,2020');
     const now = new Date();
     const date = timedate.getTime() - now.getTime(); // 得出的为毫秒
     const time = Math.ceil(date / (1000 * 60 * 60 * 24)); // 1000 * 60 * 60 * 24一天的秒数
