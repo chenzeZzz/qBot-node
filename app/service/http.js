@@ -1,24 +1,28 @@
-'use strict';
+"use strict";
 
-const axios = require('axios');
-const Service = require('egg').Service;
+const axios = require("axios");
+const Service = require("egg").Service;
+const crypto = require("crypto");
 
-const sleep = timeountMS => new Promise(resolve => {
-  setTimeout(resolve, timeountMS);
-});
+const SALT = "K4bMWJawAtnyyTNOa70S";
+
+const sleep = (timeountMS) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, timeountMS);
+  });
 
 class HttpService extends Service {
-
   async login_48() {
-    console.log('denglu one ========');
+    console.log("denglu one ========");
     const { config } = this.app;
     config.config_db.imei = config.config_db.imei || this.genImei();
     const result = await axios({
-      method: 'POST',
+      method: "POST",
       url: config.api_48_v2.login,
       headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        appInfo: '{"vendor":"apple","deviceId":"2F82F4FF-4CDA-4A30-8217-1C39E64E57C2","appVersion":"6.0.13","appBuild":"200513","osVersion":"13.4.1","osType":"ios","deviceName":"unknow","os":"ios"}',
+        "Content-Type": "application/json;charset=utf-8",
+        appInfo:
+          '{"vendor":"apple","deviceId":"2F82F4FF-4CDA-4A30-8217-1C39E64E57C2","appVersion":"6.0.13","appBuild":"200513","osVersion":"13.4.1","osType":"ios","deviceName":"unknow","os":"ios"}',
       },
       data: JSON.stringify({
         pwd: config.password,
@@ -26,30 +30,59 @@ class HttpService extends Service {
       }),
     });
     if (result.data.status === 200) {
-      this.app.socket_qbot.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: `获取 48 token: ${result.data.content.token}` }));
+      this.app.socket_qbot.send(
+        config.genMsg("send_group_msg", {
+          group_id: config.group_id_test,
+          message: `获取 48 token: ${result.data.content.token}`,
+        })
+      );
       return result.data.content;
     }
-    this.app.socket_qbot.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: '获取 48 token 失败:' + JSON.stringify(result.data) }));
+    this.app.socket_qbot.send(
+      config.genMsg("send_group_msg", {
+        group_id: config.group_id_test,
+        message: "获取 48 token 失败:" + JSON.stringify(result.data),
+      })
+    );
   }
 
   async getToken() {
     const { config } = this.app;
-    return config.config_db.token ? config.config_db.token : (await this.login_48()).token;
+    return config.config_db.token
+      ? config.config_db.token
+      : (await this.login_48()).token;
+  }
+
+  getPA() {
+    const param1 = String(new Date().getTime()).substr(0, 10) + "000";
+    const param2 = Math.floor(Math.random() * 9999);
+
+    const data = crypto
+      .createHash("md5")
+      .update(param1 + param2 + SALT)
+      .digest("hex")
+      .toUpperCase();
+
+    const pa = Buffer.from([param1, param2, data].join(",")).toString("base64");
+
+    return pa;
   }
 
   async getRoomMain(roomId, ownerId) {
     const { config } = this.app;
     const token = await this.getToken();
     const result = await axios({
-      method: 'POST',
+      method: "POST",
       url: this.config.api_48_v2.roomMain,
       timeout: 5000,
       headers: {
         token,
-        'Content-Type': 'application/json;charset=utf-8',
-        'User-Agent': 'PocketFans201807/6.0.13 (iPhone; iOS 13.4.1; Scale/2.00)',
-        pa: 'MTU5MTE5MTUzNTAwMCw0MjI1LEZFNTg0Q0Y4NUREMjE1QzJFRkQzNUNEMDBEMUE4NTE2',
-        appInfo: '{"vendor":"apple","deviceId":"2F82F4FF-4CDA-4A30-8217-1C39E64E57C2","appVersion":"6.0.13","appBuild":"200513","osVersion":"13.4.1","osType":"ios","deviceName":"unknow","os":"ios"}',
+        "Content-Type": "application/json;charset=utf-8",
+        "User-Agent":
+          "PocketFans201807/6.0.13 (iPhone; iOS 13.4.1; Scale/2.00)",
+        pa: this.getPA(),
+        appInfo:
+          '{"vendor":"apple","deviceId":"2F82F4FF-4CDA-4A30-8217-1C39E64E57C2","appVersion":"6.0.13","appBuild":"200513","osVersion":"13.4.1","osType":"ios","deviceName":"unknow","os":"ios"}',
       },
       data: JSON.stringify({
         needTop1Msg: false,
@@ -58,10 +91,15 @@ class HttpService extends Service {
         nextTime: 0,
       }),
     });
-    console.log('result.data====', result.status);
-    console.log('result.data====', result.data);
+    console.log("result.data====", result.status);
+    console.log("result.data====", result.data);
     if (result.data.status !== 200 && result.data.message) {
-      this.app.socket_qbot.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: `${config.account} 48 账号过期` }));
+      this.app.socket_qbot.send(
+        config.genMsg("send_group_msg", {
+          group_id: config.group_id_test,
+          message: `${config.account} 48 账号过期`,
+        })
+      );
       const newToken = (await this.login_48()).token;
       if (!newToken) return [];
       config.config_db.token = newToken;
@@ -75,7 +113,7 @@ class HttpService extends Service {
   async getAnswerDetail(answerId, questionId) {
     const token = await this.getToken();
     const result = await axios({
-      method: 'POST',
+      method: "POST",
       url: this.app.config.api_48_v2.question_answer,
       headers: this.config.headers(this.app.config.config_db.imei, token),
       data: { answerId, questionId },
