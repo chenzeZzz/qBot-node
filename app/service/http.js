@@ -3,6 +3,10 @@
 const axios = require('axios');
 const Service = require('egg').Service;
 
+const sleep = timeountMS => new Promise(resolve => {
+  setTimeout(resolve, timeountMS);
+});
+
 class HttpService extends Service {
 
   async login_48() {
@@ -14,7 +18,7 @@ class HttpService extends Service {
       url: config.api_48_v2.login,
       headers: {
         'Content-Type': 'application/json;charset=utf-8',
-        appInfo: '{"vendor":"apple","deviceId":"2F82F4FF-4CDA-4A30-8217-1C39E64E57C2","appVersion":"6.0.0","appBuild":"190409","osVersion":"9.3.2","osType":"ios","deviceName":"iPhone SE","os":"ios"}',
+        appInfo: '{"vendor":"apple","deviceId":"2F82F4FF-4CDA-4A30-8217-1C39E64E57C2","appVersion":"6.0.13","appBuild":"200513","osVersion":"13.4.1","osType":"ios","deviceName":"unknow","os":"ios"}',
       },
       data: JSON.stringify({
         pwd: config.password,
@@ -43,6 +47,9 @@ class HttpService extends Service {
       headers: {
         token,
         'Content-Type': 'application/json;charset=utf-8',
+        'User-Agent': 'PocketFans201807/6.0.13 (iPhone; iOS 13.4.1; Scale/2.00)',
+        pa: 'MTU5MTE5MTUzNTAwMCw0MjI1LEZFNTg0Q0Y4NUREMjE1QzJFRkQzNUNEMDBEMUE4NTE2',
+        appInfo: '{"vendor":"apple","deviceId":"2F82F4FF-4CDA-4A30-8217-1C39E64E57C2","appVersion":"6.0.13","appBuild":"200513","osVersion":"13.4.1","osType":"ios","deviceName":"unknow","os":"ios"}',
       },
       data: JSON.stringify({
         needTop1Msg: false,
@@ -51,12 +58,15 @@ class HttpService extends Service {
         nextTime: 0,
       }),
     });
+    console.log('result.data====', result.status);
+    console.log('result.data====', result.data);
     if (result.data.status !== 200 && result.data.message) {
       this.app.socket_qbot.send(config.genMsg('send_group_msg', { group_id: config.group_id_test, message: `${config.account} 48 账号过期` }));
       const newToken = (await this.login_48()).token;
       if (!newToken) return [];
       config.config_db.token = newToken;
       await this.app.syncDb();
+      await sleep(3000);
       return await this.getRoomMain(roomId, ownerId);
     }
     return result.data.content.message;
