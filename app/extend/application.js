@@ -142,7 +142,6 @@ module.exports = {
                     );
                     break;
                   }
-                  console.log("start to invoke");
                   const data = await that.getJiZiDetail();
                   const msg =
                     `${data.title} \n` +

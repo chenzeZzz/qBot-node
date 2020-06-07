@@ -4,7 +4,9 @@ const axios = require("axios");
 const Service = require("egg").Service;
 const crypto = require("crypto");
 
-const SALT = "K4bMWJawAtnyyTNOa70S";
+const utils = require("../lib/utils");
+
+const FASALT = "K4bMWJawAtnyyTNOa70S";
 
 const sleep = (timeountMS) =>
   new Promise((resolve) => {
@@ -58,7 +60,7 @@ class HttpService extends Service {
     const randomNum = Math.floor(Math.random() * 9999);
     const mixData = crypto
       .createHash("md5")
-      .update(timestamp + randomNum + SALT)
+      .update(timestamp + randomNum + FASALT)
       .digest("hex")
       .toUpperCase();
 
@@ -93,8 +95,6 @@ class HttpService extends Service {
         nextTime: 0,
       }),
     });
-    console.log("result.data====", result.status);
-    console.log("result.data====", result.data);
     if (result.data.status !== 200 && result.data.message) {
       this.app.socket_qbot.send(
         config.genMsg("send_group_msg", {
@@ -131,17 +131,22 @@ class HttpService extends Service {
    * @param {*} questionId
    */
   async getRankInfoFromTaoba(answerId, questionId) {
-    const token = await this.getToken();
+    const params = {
+      id: this.app.config.taoba.taobaId,
+      requestTime: new Date().getTime(),
+      pf: "h5",
+    };
     const result = await axios({
       method: "POST",
-      url: this.app.config.api_48_v2.question_answer,
-      headers: this.config.headers(this.app.config.config_db.imei, token),
-      data: { answerId, questionId },
+      url: this.app.config.taoba.rankUrl,
+      headers: this.app.config.taoba.headers,
+      data: JSON.stringify(params),
     });
-    if (result && result.data.content) {
-      return result.data.content.userName;
+    const data = await utils.decodeData(result.data);
+
+    if (data.code === 0) {
+      return data.list;
     }
-    return answerId;
   }
 }
 

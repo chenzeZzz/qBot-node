@@ -2,12 +2,13 @@
 
 const Subscription = require("egg").Subscription;
 const _ = require("lodash");
+const moment = require("moment");
 
 class Taoba extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
-      disable: true,
+      disable: false,
       interval: "1m", // 1 分钟间隔
       immediate: true,
       type: "worker", // 指定所有的 worker 都需要执行
@@ -16,57 +17,78 @@ class Taoba extends Subscription {
 
   // subscribe 是真正定时任务执行时被运行的函数
   async subscribe() {
-    const that = this;
+    const ctx = this;
+    const taobaId = this.config.taoba.taobaId;
 
     console.log(`刷新${this.app.config.target_name}的桃叭信息`);
-    if (!that.config.modian_id) {
+    if (!taobaId) {
       return;
     }
-    const form = {
-      pro_id: this.app.config.modian_id,
-      type: 1,
-    };
-    const order_list = await this.app.getModianDetail(
-      form,
-      this.app.config.modian_order_url
-    );
-    if (!order_list || order_list.length < 1) return;
-    const modian_user_list = this.app.config.config_db.modian_user_list;
-    for (const iterator of order_list) {
-      if (
-        _.find(modian_user_list, {
-          user_id: iterator.user_id,
-          pay_time: iterator.pay_time,
-        })
-      ) {
-        continue;
+
+    const orderList = await this.service.http.getRankInfoFromTaoba();
+    if (!orderList || !orderList.length) return;
+    // 取最新的一条，判断是否为新增.
+    let skip = true;
+    try {
+      skip = (Number(orderList[0].stime) + 60) * 1000 < new Date().getTime();
+    } catch (error) {
+      skip = false;
+      this.errLog("桃叭 list 判断失败======" + error);
+    }
+    if (skip) return; // 没新增
+
+    const lastRecordInDb = (await ctx.service.taoba.getLastTaobaRecordByTaobaId(
+      taobaId
+    )) || { stime: 0 };
+    // { id: 53983,
+    //   sn: '7ltlxf',
+    //   money: '20.00',
+    //   flower: 0,
+    //   userid: 10447421,
+    //   stime: 1591522843,
+    //   nick: 'qyc_TT',
+    //   avatar:
+    //    'https://tvax3.sinaimg.cn/crop.0.14.751.751.1024/9cceebdfly8fi6u6z0dm3j20kv0lo0uz.jpg?KID=imgbed,tva&Expires=1587043178&ssig=CdI3pS0OMR'
+    // }
+    const records = [];
+    orderList.filter((item) => {
+      if (Number(lastRecordInDb.stime) < item.stime) {
+        records.push({
+          taobaId,
+          listId: item.id,
+          money: item.money,
+          uid: item.userid,
+          nick: item.nick,
+          stime: item.stime * 1000,
+        });
       }
-      modian_user_list.push(iterator);
+    });
+    if (!records.length) return;
 
-      if (form.type) delete form.type;
-      if (form.sign) delete form.sign;
+    // save db
+    await ctx.service.taoba.savaTaoba(records);
 
-      let donate_detail = await this.app.getModianDetail(
-        form,
-        this.app.config.modian_detail_url
-      );
-      donate_detail = donate_detail[0];
-
+    // get donation detail
+    const donationDetail = await ctx.app.getJiZiDetail();
+    records.forEach((iterator) => {
       const msg =
-        `感谢 ${iterator.nickname} 刚刚在${donate_detail.pro_name}中支持了：${iterator.backer_money}元！ \n` +
-        `已筹￥: ${donate_detail.already_raised} \n` +
-        `距离目标￥: ${donate_detail.goal} 还有 ${
-          Number(donate_detail.goal) - Number(donate_detail.already_raised)
+        `感谢 ${iterator.nick} 刚刚在${donationDetail.title}中支持了：${iterator.money}元！ \n` +
+        `已筹￥: ${donationDetail.donation} \n` +
+        `距离目标: ¥${donationDetail.amount} 还有 $${
+          Number(donationDetail.amount) - Number(donationDetail.donation)
         }\n` +
-        `集资链接: ${this.app.config.target_site_origin}` +
-        "输入 `集资` 查看详情";
+        `集资截止时间: ${moment(donationDetail.expire * 1000).format(
+          "YYYY-MM-DD"
+        )} \n` +
+        `集资链接: ${this.app.config.target_site_origin} \n` +
+        "输入 `集资` 或者 `jz` 查看详情";
       this.app.socket_qbot.send(
         this.app.config.genMsg("send_group_msg", {
           group_id: this.app.config.group_id,
           message: msg,
         })
       );
-    }
+    });
   }
 }
 
