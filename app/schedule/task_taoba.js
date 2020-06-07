@@ -73,8 +73,8 @@ class Taoba extends Subscription {
     records.forEach((iterator) => {
       const msg =
         `感谢 ${iterator.nick} 刚刚在${donationDetail.title}中支持了：${iterator.money}元！ \n` +
-        `已筹￥: ${donationDetail.donation} \n` +
-        `距离目标: ¥${donationDetail.amount} 还有 $${
+        `已筹: ${donationDetail.donation} 元\n` +
+        `距离目标: ${donationDetail.amount} 还有 ${
           Number(donationDetail.amount) - Number(donationDetail.donation)
         }\n` +
         `集资截止时间: ${moment(donationDetail.expire * 1000).format(
