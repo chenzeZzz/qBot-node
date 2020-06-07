@@ -148,7 +148,7 @@ module.exports = {
                     ` \n` +
                     `完成金额: ${data.donation} \n` +
                     `目标金额: ${data.amount} \n` +
-                    `支持进度: ${data.percent} % \n` +
+                    `支持进度: ${Number(data.percent).toFixed(2)}% \n` +
                     `截止时间: ${moment(data.expire * 1000).format(
                       "YYYY-MM-DD"
                     )} \n` +
