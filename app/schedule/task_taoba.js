@@ -3,7 +3,7 @@
 const Subscription = require("egg").Subscription;
 const _ = require("lodash");
 
-class UpdateCache extends Subscription {
+class Taoba extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
@@ -18,7 +18,7 @@ class UpdateCache extends Subscription {
   async subscribe() {
     const that = this;
 
-    console.log(`刷新${this.app.config.target_name}的摩点信息`);
+    console.log(`刷新${this.app.config.target_name}的桃叭信息`);
     if (!that.config.modian_id) {
       return;
     }
@@ -70,4 +70,4 @@ class UpdateCache extends Subscription {
   }
 }
 
-module.exports = UpdateCache;
+module.exports = Taoba;

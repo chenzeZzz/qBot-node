@@ -54,17 +54,19 @@ class HttpService extends Service {
   }
 
   getPA() {
-    const param1 = String(new Date().getTime()).substr(0, 10) + "000";
-    const param2 = Math.floor(Math.random() * 9999);
-
-    const data = crypto
+    const timestamp = parseInt(new Date().getTime() / 1000) + "000";
+    const randomNum = Math.floor(Math.random() * 9999);
+    const mixData = crypto
       .createHash("md5")
-      .update(param1 + param2 + SALT)
+      .update(timestamp + randomNum + SALT)
       .digest("hex")
       .toUpperCase();
 
-    const pa = Buffer.from([param1, param2, data].join(",")).toString("base64");
-
+    // MTU5MTIwODM1NjAwMCw3NzI3LGVkNzRiMjJlMTA0YTAwMWRjZmRmOWNlYTZlNTM4YWUw
+    // 1591208376000,324,B4172C84B44E1C7651EE1A5320227892
+    const pa = Buffer.from([timestamp, randomNum, mixData].join(",")).toString(
+      "base64"
+    );
     return pa;
   }
 
@@ -104,13 +106,31 @@ class HttpService extends Service {
       if (!newToken) return [];
       config.config_db.token = newToken;
       await this.app.syncDb();
-      await sleep(3000);
+      await sleep(5000);
       return await this.getRoomMain(roomId, ownerId);
     }
     return result.data.content.message;
   }
 
   async getAnswerDetail(answerId, questionId) {
+    const token = await this.getToken();
+    const result = await axios({
+      method: "POST",
+      url: this.app.config.api_48_v2.question_answer,
+      headers: this.config.headers(this.app.config.config_db.imei, token),
+      data: { answerId, questionId },
+    });
+    if (result && result.data.content) {
+      return result.data.content.userName;
+    }
+    return answerId;
+  }
+  /**
+   * Get rank info from Taoba
+   * @param {*} answerId
+   * @param {*} questionId
+   */
+  async getRankInfoFromTaoba(answerId, questionId) {
     const token = await this.getToken();
     const result = await axios({
       method: "POST",

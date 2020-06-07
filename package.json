@@ -16,8 +16,8 @@
     "iconv-lite": "^0.4.24",
     "jsonfile": "^5.0.0",
     "lodash": "^4.17.11",
+    "moment": "^2.26.0",
     "mysql2": "^1.7.0",
-    "request": "^2.88.0",
     "websocket": "^1.0.31"
   },
   "devDependencies": {
