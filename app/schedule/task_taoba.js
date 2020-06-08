@@ -30,7 +30,9 @@ class Taoba extends Subscription {
     // 取最新的一条，判断是否为新增.
     let skip = true;
     try {
-      skip = (Number(orderList[0].stime) + 60) * 1000 < new Date().getTime();
+      skip =
+        (Number(orderList[0].stime) + 60 * 60 * 24) * 1000 <
+        new Date().getTime();
     } catch (error) {
       skip = false;
       this.errLog("桃叭 list 判断失败======" + error);
@@ -51,8 +53,9 @@ class Taoba extends Subscription {
     //    'https://tvax3.sinaimg.cn/crop.0.14.751.751.1024/9cceebdfly8fi6u6z0dm3j20kv0lo0uz.jpg?KID=imgbed,tva&Expires=1587043178&ssig=CdI3pS0OMR'
     // }
     const records = [];
+    const lastStimeInDb = Number(new Date(lastRecordInDb.stime).getTime());
     orderList.filter((item) => {
-      if (Number(lastRecordInDb.stime) < item.stime) {
+      if (lastStimeInDb < Number(item.stime) * 1000) {
         records.push({
           taobaId,
           listId: item.id,
