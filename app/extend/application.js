@@ -292,7 +292,7 @@ module.exports = {
         Number(targetItem.donation) - Number(masterItem.donation)
       ).toFixed(2)}\n` : '';
 
-      const data = await this.getJiZiDetail();
+      const data = await this.getJiZiDetail(taobaId, config);
       const msg =
         `${data.title} \n` +
         ' \n' +
@@ -326,8 +326,10 @@ module.exports = {
   async sendNormalInfo() {
     const client = this.getSocket();
     const config = this.config;
+    const taobaId = config.taoba.taobaId;
+
     try {
-      if (!config.taoba.taobaId) {
+      if (!taobaId) {
         client.send(
           config.genMsg('send_group_msg', {
             group_id: config.group_id,
@@ -336,7 +338,7 @@ module.exports = {
         );
         return false;
       }
-      const data = await this.getJiZiDetail();
+      const data = await this.getJiZiDetail(taobaId, config);
       const msg =
         `${data.title} \n` +
         ' \n' +
@@ -367,7 +369,7 @@ module.exports = {
   },
 
 
-  async getJiZiDetail() {
+  async getJiZiDetail(taobaId, config) {
     // return new Promise((res, rej) => {
     //   form.sign = this.signModianForm(form);
     //   request.post(
@@ -391,14 +393,14 @@ module.exports = {
     // });
 
     const params = {
-      id: this.config.taoba.taobaPKId,
+      id: taobaId,
       requestTime: new Date().getTime(),
       pf: 'h5',
     };
     const result = await axios({
       method: 'POST',
-      url: this.config.taoba.url,
-      headers: this.config.taoba.headers,
+      url: config.taoba.url,
+      headers: config.taoba.headers,
       data: JSON.stringify(params),
     });
 

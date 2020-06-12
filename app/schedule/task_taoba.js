@@ -71,7 +71,8 @@ class Taoba extends Subscription {
     await ctx.service.taoba.savaTaoba(records);
 
     // get donation detail
-    const donationDetail = await ctx.app.getJiZiDetail();
+    const donationDetail = await ctx.app.getJiZiDetail(taobaId, this.app.config);
+
     records.forEach(iterator => {
       const msg =
         `感谢 ${iterator.nick} 刚刚在${donationDetail.title}中支持了：${iterator.money}元！ \n` +
