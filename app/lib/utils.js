@@ -1,7 +1,7 @@
-"use strict";
-const zlib = require("zlib");
+'use strict';
+const zlib = require('zlib');
 
-const TaoBaSalt = "%#54$^%&SDF^A*52#@7";
+const TaoBaSalt = '%#54$^%&SDF^A*52#@7';
 
 function addSalt(data) {
   for (let index = 0; index < data.length; index++) {
@@ -16,9 +16,9 @@ function addSalt(data) {
 
 function decodeData(originText) {
   return new Promise((res, rej) => {
-    const source = originText.split("$")[1];
+    const source = originText.split('$')[1];
     // base64解码 加盐
-    const decodeB64 = addSalt(Buffer.from(source, "base64"));
+    const decodeB64 = addSalt(Buffer.from(source, 'base64'));
 
     zlib.unzip(decodeB64, (err, buffer) => {
       if (err) {

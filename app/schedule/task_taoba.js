@@ -1,17 +1,16 @@
-"use strict";
+'use strict';
 
-const Subscription = require("egg").Subscription;
-const _ = require("lodash");
-const moment = require("moment");
+const Subscription = require('egg').Subscription;
+const moment = require('moment');
 
 class Taoba extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
       disable: false,
-      interval: "1m", // 1 分钟间隔
+      interval: '1m', // 1 分钟间隔
       immediate: true,
-      type: "worker", // 指定所有的 worker 都需要执行
+      type: 'worker', // 指定所有的 worker 都需要执行
     };
   }
 
@@ -25,7 +24,7 @@ class Taoba extends Subscription {
       return;
     }
 
-    const orderList = await this.service.http.getRankInfoFromTaoba();
+    const orderList = await this.service.http.getRankInfoFromTaoba(taobaId);
     if (!orderList || !orderList.length) return;
     // 取最新的一条，判断是否为新增.
     let skip = true;
@@ -35,7 +34,7 @@ class Taoba extends Subscription {
         new Date().getTime();
     } catch (error) {
       skip = false;
-      this.errLog("桃叭 list 判断失败======" + error);
+      this.errLog('桃叭 list 判断失败======' + error);
     }
     if (skip) return; // 没新增
 
@@ -54,7 +53,7 @@ class Taoba extends Subscription {
     // }
     const records = [];
     const lastStimeInDb = Number(new Date(lastRecordInDb.stime).getTime());
-    orderList.filter((item) => {
+    orderList.forEach(item => {
       if (lastStimeInDb < Number(item.stime) * 1000) {
         records.push({
           taobaId,
@@ -73,20 +72,20 @@ class Taoba extends Subscription {
 
     // get donation detail
     const donationDetail = await ctx.app.getJiZiDetail();
-    records.forEach((iterator) => {
+    records.forEach(iterator => {
       const msg =
         `感谢 ${iterator.nick} 刚刚在${donationDetail.title}中支持了：${iterator.money}元！ \n` +
         `已筹: ${donationDetail.donation} 元\n` +
-        `距离目标: ${donationDetail.amount} 还有 ${
+        `距离目标: ${donationDetail.amount} 还有 ${(
           Number(donationDetail.amount) - Number(donationDetail.donation)
-        }\n` +
+        ).toFixed(2)}\n` +
         `集资截止时间: ${moment(donationDetail.expire * 1000).format(
-          "YYYY-MM-DD"
+          'YYYY-MM-DD'
         )} \n` +
         `集资链接: ${this.app.config.target_site_origin} \n` +
-        "输入 `集资` 或者 `jz` 查看详情";
+        '输入 `集资` 或者 `jz` 查看详情';
       this.app.socket_qbot.send(
-        this.app.config.genMsg("send_group_msg", {
+        this.app.config.genMsg('send_group_msg', {
           group_id: this.app.config.group_id,
           message: msg,
         })
