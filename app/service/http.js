@@ -95,7 +95,7 @@ class HttpService extends Service {
         nextTime: 0,
       }),
     });
-    if (result.data.status !== 200 && result.data.message) {
+    if (result.data.status !== 200) {
       this.app.socket_qbot.send(
         config.genMsg('send_group_msg', {
           group_id: config.group_id_test,
