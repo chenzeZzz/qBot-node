@@ -132,9 +132,9 @@ module.exports = {
             switch (event_data.message) {
               case '集资':
               case 'jz':
-                // await that.sendNormalInfo();
+                await that.sendNormalInfo();
 
-                await that.sendPKInfo(); // pk 集资信息
+                // await that.sendPKInfo(); // pk 集资信息
                 break;
               case '微博':
                 try {
