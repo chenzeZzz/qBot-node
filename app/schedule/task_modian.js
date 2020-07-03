@@ -1,16 +1,16 @@
-"use strict";
+'use strict';
 
-const Subscription = require("egg").Subscription;
-const _ = require("lodash");
+const Subscription = require('egg').Subscription;
+const _ = require('lodash');
 
 class UpdateCache extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
       disable: true,
-      interval: "1m", // 1 分钟间隔
+      interval: '1m', // 1 分钟间隔
       immediate: true,
-      type: "worker", // 指定所有的 worker 都需要执行
+      type: 'worker', // 指定所有的 worker 都需要执行
     };
   }
 
@@ -58,10 +58,10 @@ class UpdateCache extends Subscription {
         `距离目标￥: ${donate_detail.goal} 还有 ${
           Number(donate_detail.goal) - Number(donate_detail.already_raised)
         }\n` +
-        `集资链接: ${this.app.config.target_site_origin}` +
-        "输入 `集资` 查看详情";
+        `集资链接: ${this.app.config.target_site_origin + config.taoba.taobaId}` +
+        '输入 `集资` 查看详情';
       this.app.socket_qbot.send(
-        this.app.config.genMsg("send_group_msg", {
+        this.app.config.genMsg('send_group_msg', {
           group_id: this.app.config.group_id,
           message: msg,
         })

@@ -125,7 +125,7 @@ class TaobaPK extends Subscription {
         `集资截止时间: ${moment(masterItem.expire * 1000).format(
           'YYYY-MM-DD'
         )} \n` +
-        `集资链接: ${this.app.config.target_site_origin} \n` +
+        `集资链接: ${this.app.config.target_site_origin + this.app.config.taoba.taobaPKId} \n` +
         '输入 `集资` 或者 `jz` 查看详情';
       this.app.socket_qbot.send(
         this.app.config.genMsg('send_group_msg', {

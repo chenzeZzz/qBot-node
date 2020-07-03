@@ -214,7 +214,7 @@ module.exports = {
               '找应援会： \n' +
               '微博：http://weibo.com/u/5742612817 \n' +
               'B站 : https://space.bilibili.com/57253753 \n' +
-              `生日集资连接：${config.target_site_origin} \n` +
+              `集资连接：${config.target_site_origin + config.taoba.taobaId} \n` +
               // '输入 `微博` 查看最新微博详情' +
               '\n';
 
@@ -326,7 +326,7 @@ module.exports = {
         `集资截止时间: ${moment(masterItem.expire * 1000).format(
           'YYYY-MM-DD'
         )} \n` +
-        `集资链接: ${this.config.target_site_origin} \n` +
+        `集资链接: ${config.target_site_origin + taobaId} \n` +
         '输入 `集资` 或者 `jz` 查看详情';
       client.send(
         config.genMsg('send_group_msg', {
@@ -372,7 +372,7 @@ module.exports = {
         `截止时间: ${moment(data.expire * 1000).format(
           'YYYY-MM-DD'
         )} \n` +
-        `集资链接: ${config.target_site_origin} \n` +
+        `集资链接: ${config.target_site_origin + config.taoba.taobaId} \n` +
         '输入 `集资` 或者 `jz` 查看详情';
       client.send(
         config.genMsg('send_group_msg', {
