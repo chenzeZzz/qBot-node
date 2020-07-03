@@ -149,28 +149,6 @@ class HttpService extends Service {
       return data.list;
     }
   }
-
-  /**
-   * Get rank info from Taoba
-   */
-  async getPkstatsFromTaoba() {
-    const params = {
-      pkgroup: this.app.config.taoba.pkgroup,
-      requestTime: new Date().getTime(),
-      _version_: 1,
-      pf: 'h5',
-    };
-    const result = await axios({
-      method: 'POST',
-      url: this.app.config.taoba.pkUrl,
-      headers: this.app.config.taoba.headers,
-      data: JSON.stringify(params),
-    });
-    const data = await utils.decodeData(result.data);
-    if (data.code === 0) {
-      return data.list;
-    }
-  }
 }
 
 module.exports = HttpService;

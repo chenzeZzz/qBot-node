@@ -7,7 +7,7 @@ class TaobaPK extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
-      disable: true,
+      disable: false,
       interval: '1m', // 1 分钟间隔
       immediate: true,
       type: 'worker', // 指定所有的 worker 都需要执行
@@ -64,7 +64,6 @@ class TaobaPK extends Subscription {
         });
       }
     });
-    console.log('lastReorderListcordInDb===', orderList);
 
     if (!records.length) return;
 
@@ -99,7 +98,7 @@ class TaobaPK extends Subscription {
     //         }
     //     }
     // ]
-    const pkstats = await this.service.http.getPkstatsFromTaoba();
+    const pkstats = await this.app.getPkstatsFromTaoba();
     let rankIndex = -1;
     pkstats.forEach((item, index) => {
       if (String(item.id) === taobaId) {

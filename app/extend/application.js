@@ -234,12 +234,36 @@ module.exports = {
   },
 
   /**
-   * Get rank info from Taoba
-   * @param {Object} config ''
+   * Get pkgroup
    */
-  async getPkstatsFromTaoba(config) {
+  async getPkgroupFromTaoba() {
+    const config = this.config;
     const params = {
-      pkgroup: config.taoba.pkgroup,
+      id: config.taoba.taobaPKId,
+      requestTime: new Date().getTime(),
+      _version_: 1,
+      pf: 'h5',
+    };
+    const result = await axios({
+      method: 'POST',
+      url: config.taoba.pkDetailUrl,
+      headers: config.taoba.headers,
+      data: JSON.stringify(params),
+    });
+    const data = await utils.decodeData(result.data);
+    if (data.code === 0) {
+      return data.datas.pkgroup;
+    }
+  },
+
+  /**
+   * Get rank info from Taoba
+   */
+  async getPkstatsFromTaoba() {
+    const config = this.config;
+    const pkgroup = await this.getPkgroupFromTaoba();
+    const params = {
+      pkgroup,
       requestTime: new Date().getTime(),
       _version_: 1,
       pf: 'h5',
@@ -274,7 +298,7 @@ module.exports = {
       }
 
 
-      const pkstats = await this.getPkstatsFromTaoba(config);
+      const pkstats = await this.getPkstatsFromTaoba();
       let rankIndex = -1;
       pkstats.forEach((item, index) => {
         if (String(item.id) === taobaId) {
