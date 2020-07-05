@@ -26,6 +26,7 @@
   },
   "scripts": {
     "start": "egg-scripts start --cluster=1 --daemon",
+    "restart": "npm run stop & npm run start",
     "stop": "egg-scripts stop",
     "dev": "egg-bin dev --sticky",
     "test": "echo \"Error: no test specified\" && exit 1"
