@@ -132,19 +132,14 @@ module.exports = {
             switch (event_data.message) {
               case '集资':
               case 'jz':
-                await that.sendNormalInfo();
+                await that.sendNormalInfo(config.taoba.taobaId, event_data.message);
 
-                // await that.sendPKInfo(); // pk 集资信息
+                // await that.sendPKInfo(config.taoba.taobaPKId, event_data.message); // pk 集资信息
                 break;
 
               case '金曲':
               case 'b50':
-                that.socket_qbot.send(
-                  that.config.genMsg('send_group_msg', {
-                    group_id: config.group_id,
-                    message: 'https://www.taoba.club/index/#/pages/idols/detail?id=9247',
-                  })
-                );
+                await that.sendNormalInfo(config.taoba.taobaId2, event_data.message);
                 break;
 
               case '微博':
@@ -292,10 +287,9 @@ module.exports = {
   },
 
   // 发送 pk 集资信息
-  async sendPKInfo() {
+  async sendPKInfo(taobaId, keyword) {
     const client = this.getSocket();
     const config = this.config;
-    const taobaId = config.taoba.taobaPKId;
 
     try {
       if (!taobaId) {
@@ -338,7 +332,8 @@ module.exports = {
           'YYYY-MM-DD'
         )} \n` +
         `集资链接: ${config.target_site_origin + taobaId} \n` +
-        '输入 `集资` 或者 `jz` 查看详情';
+        `输入 ${keyword} 查看详情`;
+
       client.send(
         config.genMsg('send_group_msg', {
           group_id: config.group_id,
@@ -358,10 +353,9 @@ module.exports = {
   },
 
   // 发送普通集资信息
-  async sendNormalInfo() {
+  async sendNormalInfo(taobaId, keyword) {
     const client = this.getSocket();
     const config = this.config;
-    const taobaId = config.taoba.taobaId;
 
     try {
       if (!taobaId) {
@@ -383,8 +377,8 @@ module.exports = {
         `截止时间: ${moment(data.expire * 1000).format(
           'YYYY-MM-DD'
         )} \n` +
-        `集资链接: ${config.target_site_origin + config.taoba.taobaId} \n` +
-        '输入 `集资` 或者 `jz` 查看详情';
+        `集资链接: ${config.target_site_origin + taobaId} \n` +
+        `输入 ${keyword} 查看详情`;
       client.send(
         config.genMsg('send_group_msg', {
           group_id: config.group_id,
