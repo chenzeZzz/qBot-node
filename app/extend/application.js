@@ -136,6 +136,17 @@ module.exports = {
 
                 // await that.sendPKInfo(); // pk 集资信息
                 break;
+
+              case '金曲':
+              case 'b50':
+                that.socket_qbot.send(
+                  that.config.genMsg('send_group_msg', {
+                    group_id: config.group_id,
+                    message: 'https://www.taoba.club/index/#/pages/idols/detail?id=9247',
+                  })
+                );
+                break;
+
               case '微博':
                 try {
                   const result = await that.isWeiboUpdate();
