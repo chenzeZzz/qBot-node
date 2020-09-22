@@ -17,7 +17,13 @@ class Taoba extends Subscription {
   // subscribe 是真正定时任务执行时被运行的函数
   async subscribe() {
     const ctx = this;
-    const taobaId = this.config.taoba.taobaId;
+    const taobaId = this.config.taoba.taobaIdTmp;
+
+    if (taobaId !== this.config.taoba.taobaId) {
+      this.config.taoba.taobaIdTmp = this.config.taoba.taobaId;
+    } else {
+      this.config.taoba.taobaIdTmp = this.config.taoba.taobaId2;
+    }
 
     console.log(`刷新${this.app.config.target_name}的桃叭信息`);
     if (!taobaId) {
