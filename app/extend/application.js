@@ -137,10 +137,10 @@ module.exports = {
 
               case '金曲':
               case 'b50':
-              // case 'pk':
-                await that.sendNormalInfo(config.taoba.taobaId, event_data.message);
+              case 'pk':
+                // await that.sendNormalInfo(config.taoba.taobaId, event_data.message);
 
-                // await that.sendPKInfo(config.taoba.taobaPKId, event_data.message); // pk 集资信息
+                await that.sendPKInfo(config.taoba.taobaPKId, event_data.message); // pk 集资信息
                 break;
 
               case '微博':
