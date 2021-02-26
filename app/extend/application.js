@@ -192,6 +192,16 @@ module.exports = {
                 }
                 break;
 
+              case '合成吕一':
+              case '合成口口一':
+                client.send(
+                  config.genMsg('send_group_msg', {
+                    group_id: config.group_id,
+                    message: 'http://plashspeed.top/xigua/game?id=816e75df',
+                  })
+                );
+                break;
+
               default:
                 break;
             }
