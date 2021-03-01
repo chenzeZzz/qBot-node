@@ -201,6 +201,14 @@ module.exports = {
                   })
                 );
                 break;
+              case '安利':
+                client.send(
+                  config.genMsg('send_group_msg', {
+                    group_id: config.group_id,
+                    message: 'https://b23.tv/8doF1Y',
+                  })
+                );
+                break;
 
               default:
                 break;
