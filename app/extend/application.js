@@ -339,9 +339,9 @@ module.exports = {
         Number(targetItem.donation) - Number(masterItem.donation)
       ).toFixed(2)}\n` : '';
 
-      const data = await this.getJiZiDetail(taobaId, config);
+      // const data = await this.getJiZiDetail(taobaId, config);
       const msg =
-        `${data.title} \n` +
+        `${masterItem.title} \n` +
         ' \n' +
         `已筹: ${masterItem.donation} 元\n` +
         `排名: ${rankIndex + 1} 名\n` +
@@ -446,7 +446,7 @@ module.exports = {
     };
     const result = await axios({
       method: 'POST',
-      url: config.taoba.url,
+      url: config.taoba.detail,
       headers: config.taoba.headers,
       data: JSON.stringify(params),
     });

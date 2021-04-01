@@ -133,8 +133,8 @@ class HttpService extends Service {
   async getRankInfoFromTaoba(taobaId) {
     const params = {
       id: taobaId,
-      limit: 1,
       requestTime: new Date().getTime(),
+      _version_: 1,
       pf: 'h5',
     };
     const result = await axios({
