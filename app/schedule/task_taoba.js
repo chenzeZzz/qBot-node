@@ -20,6 +20,12 @@ class Taoba extends Subscription {
     const ctx = this;
     const taobaId = this.config.taoba.taobaIdTmp || this.config.taoba.taobaId;
 
+    if (taobaId !== this.config.taoba.taobaId) {
+      this.config.taoba.taobaIdTmp = this.config.taoba.taobaId;
+    } else {
+      this.config.taoba.taobaIdTmp = this.config.taoba.taobaId2;
+    }
+
     console.log(`刷新${this.app.config.target_name}的桃叭信息`);
     if (!taobaId) {
       return;
