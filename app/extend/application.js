@@ -135,8 +135,6 @@ module.exports = {
                 await that.sendNormalInfo(config.taoba.taobaId, event_data.message);
                 break;
 
-              case '金曲':
-              case 'b50':
               case 'pk':
                 // await that.sendNormalInfo(config.taoba.taobaId, event_data.message);
 
