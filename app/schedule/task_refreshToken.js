@@ -20,7 +20,7 @@ class UpdateCache extends Subscription {
 
     // token 写到 db
     console.log('refresh 48 token from db.');
-    const token = await ctx.model.Token.findOneById();
+    const { token } = await ctx.model.Token.findOneById();
     config.pocketToken.token = token;
   }
 

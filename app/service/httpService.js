@@ -50,10 +50,13 @@ class HttpService extends Service {
   }
 
   async getToken() {
-    const { config } = this.app;
-    return config.pocketToken.token
-      ? config.pocketToken.token
-      : (await this.login_48()).token;
+    const { config, ctx } = this;
+    const { token } = await ctx.model.Token.findOneById();
+    config.pocketToken.token = token;
+    return token;
+    // return config.pocketToken.token
+    //   ? config.pocketToken.token
+    //   : (await this.login_48()).token;
   }
 
   getPA() {
@@ -96,6 +99,7 @@ class HttpService extends Service {
         nextTime: 0,
       }),
     });
+    console.log('sxixxixixi===', result.data);
     if (result.data.status !== 200) {
       this.app.socket_qbot.send(
         config.genMsg('send_group_msg', {
