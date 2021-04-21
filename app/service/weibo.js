@@ -17,45 +17,45 @@ class WeiboService extends Service {
   }
 
   async isWeiboUpdate() {
-    const { config, socket_qbot} = this.ctx.app;
+    const { config, socket_qbot } = this.ctx.app;
     try {
       const result = await weiboSpider.getRemoteLastWeibo(config.weiboId);
       if (!result || !result.last_weibo_id) return;
       // 检查收否已经存 db
       const isNewWeibo = await this.isWeiboExist(result.last_weibo_id);
-      console.log('isNewWeibo=====', isNewWeibo)
+      console.log('isNewWeibo=====', isNewWeibo);
       if (!isNewWeibo) {
         // 未存 db 再广播一次
         await this.ctx.model.Weibo.register({
           weiboId: result.last_weibo_id,
-          content: result.content
+          content: result.content,
         });
         let weiboUrl = '';
-      try {
-        result.last_weibo_id.substr(2);
-        weiboUrl = `https://m.weibo.cn/status/${result.last_weibo_id.substr(2)}`;
-      } catch (error) {
-        weiboUrl = '请打开微博查看';
-      }
-      const msg = [
-        {
-          type: 'text',
-          data: { text: `你们的小可爱${config.target_name}发微博啦\n` },
-        },
-        {
-          type: 'text',
-          data: { text: result.content },
-        },
-        {
-          type: 'text',
-          data: { text: '\n' },
-        },
-        {
-          type: 'text',
-          data: { text: `微博链接:\n【${weiboUrl}】` },
-        },
-      ];
-      socket_qbot.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
+        try {
+          result.last_weibo_id.substr(2);
+          weiboUrl = `https://m.weibo.cn/status/${result.last_weibo_id.substr(2)}`;
+        } catch (error) {
+          weiboUrl = '请打开微博查看';
+        }
+        const msg = [
+          {
+            type: 'text',
+            data: { text: `你们的小可爱${config.target_name}发微博啦\n` },
+          },
+          {
+            type: 'text',
+            data: { text: result.content },
+          },
+          {
+            type: 'text',
+            data: { text: '\n' },
+          },
+          {
+            type: 'text',
+            data: { text: `微博链接:\n【${weiboUrl}】` },
+          },
+        ];
+        socket_qbot.send(config.genMsg('send_group_msg', { group_id: config.group_id, message: msg }));
       // socket_qbot.send(config.genMsg('send_private_msg', { user_id: config.qq_number, message: msg }));
       }
     } catch (error) {
@@ -86,7 +86,7 @@ class WeiboService extends Service {
   async spiderOneRoom(roomId, ownerId, name, isOtherRoom) {
     const { config } = this.ctx.app;
     console.log(`刷新${name}的房间内容`);
-    const roomMain = await this.service.http.getRoomMain(roomId, ownerId);
+    const roomMain = await this.service.httpService.getRoomMain(roomId, ownerId);
     roomMain.reverse();
     for (const iterator of roomMain) {
       const tmp = JSON.parse(iterator.extInfo);
@@ -130,7 +130,7 @@ class WeiboService extends Service {
       case 'FLIPCARD':
         // 获取详细内容
         message.type = '翻牌';
-        message.answerTo = await this.ctx.service.http.getAnswerDetail(iterator.extInfo.answerId, iterator.extInfo.questionId);
+        message.answerTo = await this.service.httpService.getAnswerDetail(iterator.extInfo.answerId, iterator.extInfo.questionId);
         message.question = iterator.extInfo.question;
         message.showType = `回复【${message.answerTo}】的翻牌【${iterator.extInfo.question}】`; // "faipaiUserId":666073
         message.content = `${iterator.extInfo.answer}`;

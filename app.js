@@ -2,7 +2,6 @@
 
 // defined some global env.
 global.isDev = () => process.env.NODE_ENV === 'development';
-console.log('global.isDev()=====', global.isDev());
 
 module.exports = app => {
   app.beforeStart(async function() {
@@ -36,7 +35,4 @@ module.exports = app => {
   console.error = function(...args) {
     app.logger.error.apply(app.logger, args);
   };
-
-  const file = __dirname + '/db/config.json';
-  app.initDbConfig(file);
 };

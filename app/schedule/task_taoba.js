@@ -4,6 +4,8 @@ const Subscription = require('egg').Subscription;
 const moment = require('moment');
 const _ = require('lodash');
 
+const taobaHttp = require('../lib/taobaHttp');
+
 class Taoba extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
@@ -26,13 +28,12 @@ class Taoba extends Subscription {
       this.config.taoba.taobaIdTmp = this.config.taoba.taobaId2;
     }
 
-    console.log(`刷新${this.app.config.target_name}的桃叭信息`);
+    console.log(`刷新${this.config.target_name}的桃叭信息`);
     if (!taobaId) {
       return;
     }
 
-    const orderList = await this.service.http.getRankInfoFromTaoba(taobaId);
-    console.log('orderList====', orderList.length);
+    const orderList = await taobaHttp.getRankInfoFromTaoba(this.config);
     if (!orderList || !orderList.length) return;
     // 取最新的一条，判断是否为新增.
 
@@ -70,7 +71,7 @@ class Taoba extends Subscription {
     await ctx.service.taoba.savaTaoba(records);
 
     // get donation detail
-    const donationDetail = await ctx.app.getJiZiDetail(taobaId);
+    const donationDetail = await ctx.app.getJiZiDetail(this.config);
 
     records.forEach(iterator => {
       if (iterator.addMony > 0) {
@@ -83,11 +84,11 @@ class Taoba extends Subscription {
           `集资截止时间: ${moment(donationDetail.expire * 1000).format(
             'YYYY-MM-DD'
           )} \n` +
-          `集资链接: ${this.app.config.target_site_origin + taobaId} \n` +
+          `集资链接: ${this.config.target_site_origin + taobaId} \n` +
           '输入 `集资` 或者 `jz` 查看详情';
         this.app.socket_qbot.send(
-          this.app.config.genMsg('send_group_msg', {
-            group_id: this.app.config.group_id,
+          this.config.genMsg('send_group_msg', {
+            group_id: this.config.group_id,
             message: msg,
           })
         );

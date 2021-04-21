@@ -1,11 +1,9 @@
 'use strict';
 
-const axios = require('axios');
-const jsonfile = require('jsonfile');
 const moment = require('moment');
 
 const socket = require('../lib/socket_instance');
-const utils = require('../lib/utils');
+const taobaHttp = require('../lib/taobaHttp');
 
 // 扩展一些框架便利的方法
 module.exports = {
@@ -47,68 +45,6 @@ module.exports = {
         console.log('echo-protocol Client Closed');
       };
     });
-  },
-
-  // 生成 48登录请求 hearder 种的 imei
-  genImei() {
-    const randomNum = function(minNum, maxNum) {
-      switch (arguments.length) {
-        case 1:
-          return parseInt(Math.random() * minNum + 1, 10);
-        case 2:
-          return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
-        default:
-          return 0;
-      }
-    };
-    const r1 = 1000000 + randomNum(0, 8999999);
-    const r2 = 1000000 + randomNum(0, 8999999);
-    const input = r1 + '' + r2;
-    let a = 0;
-    let b = 0;
-    for (let i = 0; i < input.length; i++) {
-      const tt = parseInt(input.slice(i, i + 1));
-      if (i % 2 === 0) {
-        a = a + tt;
-      } else {
-        const temp = tt * 2;
-        b = b + temp / 10 + (temp % 10);
-      }
-    }
-    let last = Math.round((a + b) % 10);
-    if (last === 0) {
-      last = 0;
-    } else {
-      last = 10 - last;
-    }
-    return input + '' + last;
-  },
-
-  // 同步db 内容到缓存
-  async initDbConfig(file) {
-    jsonfile
-      .readFile(file)
-      .then(obj => {
-        this.config.config_db = Object.assign(this.config.config_db, obj);
-      })
-      .catch(error => console.error('init db config err======', error));
-  },
-
-  // 写入 db目录持久化
-  async syncDb(file) {
-    if (!file) file = __dirname + '/../../db/config.json';
-    const obj = this.config.config_db;
-    await jsonfile.writeFileSync(file, obj, { spaces: 2 });
-  },
-
-  async getUserInfo(user_id) {
-    const user_info = await axios({
-      method: 'GET',
-      // url: 'http://localhost:5700/get_stranger_info',
-      url: `http://localhost:5700/get_stranger_info?user_id=${user_id}&no_cahce=false`,
-    });
-
-    return user_info;
   },
 
   async getEvent() {
@@ -247,52 +183,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Get pkgroup
-   */
-  async getPkgroupFromTaoba() {
-    const config = this.config;
-    const params = {
-      id: config.taoba.taobaPKId,
-      requestTime: new Date().getTime(),
-      _version_: 1,
-      pf: 'h5',
-    };
-    const result = await axios({
-      method: 'POST',
-      url: config.taoba.pkDetailUrl,
-      headers: config.taoba.headers,
-      data: JSON.stringify(params),
-    });
-    const data = await utils.decodeData(result.data);
-    if (data.code === 0) {
-      return data.datas.pkgroup;
-    }
-  },
-
-  /**
-   * Get rank info from Taoba
-   */
-  async getPkstatsFromTaoba() {
-    const config = this.config;
-    const pkgroup = await this.getPkgroupFromTaoba();
-    const params = {
-      pkgroup,
-      requestTime: new Date().getTime(),
-      _version_: 1,
-      pf: 'h5',
-    };
-    const result = await axios({
-      method: 'POST',
-      url: config.taoba.pkUrl,
-      headers: config.taoba.headers,
-      data: JSON.stringify(params),
-    });
-    const data = await utils.decodeData(result.data);
-    if (data.code === 0) {
-      return data.list;
-    }
-  },
 
   // 发送 pk 集资信息
   async sendPKInfo(taobaId, keyword) {
@@ -311,7 +201,7 @@ module.exports = {
       }
 
 
-      const pkstats = await this.getPkstatsFromTaoba();
+      const pkstats = await taobaHttp.getPkstatsFromTaoba(config);
       let rankIndex = -1;
       pkstats.forEach((item, index) => {
         if (String(item.id) === taobaId) {
@@ -329,7 +219,6 @@ module.exports = {
         Number(targetItem.donation) - Number(masterItem.donation)
       ).toFixed(2)}\n` : '';
 
-      // const data = await this.getJiZiDetail(taobaId, config);
       const msg =
         `${masterItem.title} \n` +
         ' \n' +
@@ -375,7 +264,7 @@ module.exports = {
         );
         return false;
       }
-      const data = await this.getJiZiDetail(taobaId);
+      const data = await taobaHttp.getJiZiDetail(config);
       const msg =
         `${data.title} \n` +
         ' \n' +
@@ -402,27 +291,6 @@ module.exports = {
       });
       this.errLog('获取集资信息失败======' + error);
       return;
-    }
-  },
-
-
-  async getJiZiDetail(taobaId) {
-    const config = this.config;
-    const params = {
-      id: taobaId,
-      requestTime: new Date().getTime(),
-      pf: 'h5',
-    };
-    const result = await axios({
-      method: 'POST',
-      url: config.taoba.detail,
-      headers: config.taoba.headers,
-      data: JSON.stringify(params),
-    });
-
-    const data = await utils.decodeData(result.data);
-    if (data.code === 0) {
-      return data.datas;
     }
   },
 };

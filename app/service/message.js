@@ -24,7 +24,7 @@ class MessageService extends Service {
   async spiderOneRoom(roomId, ownerId, name, isOtherRoom) {
     const { config } = this.ctx.app;
     console.log(`刷新${name}的房间内容`);
-    const roomMain = await this.service.http.getRoomMain(roomId, ownerId);
+    const roomMain = await this.service.httpService.getRoomMain(roomId, ownerId);
     roomMain.reverse();
     for (const iterator of roomMain) {
       const tmp = JSON.parse(iterator.extInfo);

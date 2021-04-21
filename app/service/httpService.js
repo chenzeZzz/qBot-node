@@ -6,6 +6,7 @@ const crypto = require('crypto');
 
 const utils = require('../lib/utils');
 
+
 const FASALT = 'K4bMWJawAtnyyTNOa70S';
 
 const sleep = timeountMS =>
@@ -17,7 +18,7 @@ class HttpService extends Service {
   async login_48() {
     console.log('denglu one ========');
     const { config } = this.app;
-    config.config_db.imei = config.config_db.imei || this.genImei();
+    config.pocketToken.imei = config.pocketToken.imei || utils.genImei();
     const result = await axios({
       method: 'POST',
       url: config.api_48_v2.login,
@@ -50,8 +51,8 @@ class HttpService extends Service {
 
   async getToken() {
     const { config } = this.app;
-    return config.config_db.token
-      ? config.config_db.token
+    return config.pocketToken.token
+      ? config.pocketToken.token
       : (await this.login_48()).token;
   }
 
@@ -104,7 +105,11 @@ class HttpService extends Service {
       );
       const newToken = (await this.login_48()).token;
       if (!newToken) return [];
-      config.config_db.token = newToken;
+      config.pocketToken.token = newToken;
+
+      // token 写到 db
+      await this.ctx.model.Token.UpdateToken(newToken);
+
       await this.app.syncDb();
       await sleep(5000);
       return await this.getRoomMain(roomId, ownerId);
@@ -116,8 +121,8 @@ class HttpService extends Service {
     const token = await this.getToken();
     const result = await axios({
       method: 'POST',
-      url: this.app.config.api_48_v2.question_answer,
-      headers: this.config.headers(this.app.config.config_db.imei, token),
+      url: this.config.api_48_v2.question_answer,
+      headers: this.config.headers(this.config.pocketToken.imei, token),
       data: { answerId, questionId },
     });
     if (result && result.data.content) {
@@ -126,29 +131,7 @@ class HttpService extends Service {
     return answerId;
   }
 
-  /**
-   * Get rank info from Taoba
-   * @param {string} taobaId 订单号
-   */
-  async getRankInfoFromTaoba(taobaId) {
-    const params = {
-      id: taobaId,
-      requestTime: new Date().getTime(),
-      _version_: 1,
-      pf: 'h5',
-    };
-    const result = await axios({
-      method: 'POST',
-      url: this.app.config.taoba.rankUrl,
-      headers: this.app.config.taoba.headers,
-      data: JSON.stringify(params),
-    });
-    const data = await utils.decodeData(result.data);
 
-    if (data.code === 0) {
-      return data.list;
-    }
-  }
 }
 
 module.exports = HttpService;

@@ -2,18 +2,14 @@
 
 const Subscription = require('egg').Subscription;
 
-console.log('xxxixixixi====');
+const taobaHttp = require('../lib/taobaHttp');
 
-// console.log('env====', process.env);
 class UpdateCache extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
-    // console.log('jaajajjaja', global.isDev());
-    console.log('jaajajjaja====');
-
     return {
       disable: process.env.NODE_ENV !== 'development',
-      interval: '5m', // 1 分钟间隔
+      interval: '10s', // 1 分钟间隔
       immediate: true,
       type: 'worker', // 指定所有的 worker 都需要执行
     };
@@ -38,8 +34,14 @@ class UpdateCache extends Subscription {
     // // '[CQ:image,file=kky/haha.image]';
     // this.app.errLog(msg);
 
-    const result = await this.app.getJiZiDetail(config.taoba.taobaId);
-    console.log('result===');
+    try {
+
+      const result = await taobaHttp.getRankInfoFromTaoba(config);
+      console.log('result===', result);
+    } catch (error) {
+      console.log('error===', error);
+
+    }
   }
 
 
