@@ -136,7 +136,7 @@ module.exports = {
                 break;
 
               case 'pk':
-                // await that.sendNormalInfo(config.taoba.taobaId, event_data.message);
+                // await that.sendNormalInfo(config.taoba.taobaId2, event_data.message);
 
                 await that.sendPKInfo(config.taoba.taobaPKId, event_data.message); // pk 集资信息
                 break;
@@ -220,14 +220,6 @@ module.exports = {
             event_data.group_id &&
             event_data.group_id === config.group_id
           ) {
-            // 欢迎加入SNH48-吕一应援群~
-
-            // 微博：@SNH48-吕一 ：http://weibo.com/u/6021143413
-            // B站：臭脚番茄 ：http://space.bilibili.com/11399736
-            // 找应援会：
-            // 微博：http://weibo.com/u/5742612817
-            // B站 : https://space.bilibili.com/57253753
-            // 十一月日常应援现火热进行中：https://m.modian.com/project/37894.html?nostatic=1&_wv=1031
             const msg =
               `欢迎 [CQ:at,qq=${event_data.user_id}] 加入SNH48-吕一应援群~ \n` +
               '找吕一： \n' +
@@ -383,7 +375,7 @@ module.exports = {
         );
         return false;
       }
-      const data = await this.getJiZiDetail(taobaId, config);
+      const data = await this.getJiZiDetail(taobaId);
       const msg =
         `${data.title} \n` +
         ' \n' +
@@ -414,29 +406,8 @@ module.exports = {
   },
 
 
-  async getJiZiDetail(taobaId, config) {
-    // return new Promise((res, rej) => {
-    //   form.sign = this.signModianForm(form);
-    //   request.post(
-    //     {
-    //       url,
-    //       form,
-    //       headers: this.config.modian_headers,
-    //     },
-    //     (err, response, body) => {
-    //       if (err) {
-    //         console.log("err in task modian===", err);
-    //         return;
-    //       }
-    //       body = JSON.parse(body);
-    //       if (body.status === "0") {
-    //         return res(body.data);
-    //       }
-    //       return rej("Modian response disable !");
-    //     }
-    //   );
-    // });
-
+  async getJiZiDetail(taobaId) {
+    const config = this.config;
     const params = {
       id: taobaId,
       requestTime: new Date().getTime(),
@@ -454,23 +425,4 @@ module.exports = {
       return data.datas;
     }
   },
-
-  // signModianForm(form) {
-  //   // 将键名取出按照升序排列，拼接成query string。 需要encode
-  //   form = Reflect.ownKeys(form)
-  //     .sort((a, b) => {
-  //       if (a < b) {
-  //         return -1;
-  //       } else if (a > b) {
-  //         return 1;
-  //       }
-
-  //       return 0;
-  //     })
-  //     .map((key) => `${key}=${encodeURIComponent(form[key])}`)
-  //     .join("&");
-
-  //   // 将qs 加上&p=das41aq6计算md5(16), 从第6位开始取16位
-  //   return md5(form.concat("&p=das41aq6")).substr(5, 16);
-  // },
 };

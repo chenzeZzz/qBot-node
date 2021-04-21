@@ -2,12 +2,13 @@
 
 const Subscription = require('egg').Subscription;
 const moment = require('moment');
+const _ = require('lodash');
 
 class TaobaPK extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
-      disable: false,
+      disable: process.env.NODE_ENV === 'development',
       interval: '1m', // 1 分钟间隔
       immediate: true,
       type: 'worker', // 指定所有的 worker 都需要执行
@@ -24,7 +25,6 @@ class TaobaPK extends Subscription {
     }
 
     const orderList = await this.service.http.getRankInfoFromTaoba(taobaId);
-    console.log('orderList====', orderList.length);
     if (!orderList || !orderList.length) return;
     // 取最新的一条，判断是否为新增.
 

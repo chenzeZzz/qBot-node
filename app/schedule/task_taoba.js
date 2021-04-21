@@ -8,7 +8,7 @@ class Taoba extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
-      disable: false,
+      disable: process.env.NODE_ENV === 'development',
       interval: '1m', // 1 分钟间隔
       immediate: true,
       type: 'worker', // 指定所有的 worker 都需要执行
@@ -20,7 +20,7 @@ class Taoba extends Subscription {
     const ctx = this;
     const taobaId = this.config.taoba.taobaIdTmp || this.config.taoba.taobaId;
 
-    if (taobaId !== this.config.taoba.taobaId) {
+    if (taobaId !== this.config.taoba.taobaId && this.config.taoba.taobaId2) {
       this.config.taoba.taobaIdTmp = this.config.taoba.taobaId;
     } else {
       this.config.taoba.taobaIdTmp = this.config.taoba.taobaId2;
@@ -70,7 +70,7 @@ class Taoba extends Subscription {
     await ctx.service.taoba.savaTaoba(records);
 
     // get donation detail
-    const donationDetail = await ctx.app.getJiZiDetail(taobaId, this.app.config);
+    const donationDetail = await ctx.app.getJiZiDetail(taobaId);
 
     records.forEach(iterator => {
       if (iterator.addMony > 0) {
