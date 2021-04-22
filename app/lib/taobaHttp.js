@@ -35,11 +35,11 @@ const utils = require('./utils');
 // 49.72.27.224:39490
 // 144.255.149.109:29560
 
-const httpsAgent = new HttpsProxyAgent('http://49.72.27.224:39490');
+const httpsAgent = new HttpsProxyAgent('http://36.92.5.194:8089');
 
-async function getJiZiDetail(config) {
+async function getJiZiDetail(id, config) {
   const params = {
-    id: config.taoba.taobaId,
+    id,
     requestTime: new Date().getTime(),
     pf: 'h5',
   };
@@ -60,9 +60,9 @@ async function getJiZiDetail(config) {
    * Get rank info from Taoba
    * @param {string} taobaId 订单号
    */
-async function getRankInfoFromTaoba(config) {
+async function getRankInfoFromTaoba(id, config) {
   const params = {
-    id: config.taoba.taobaId,
+    id,
     requestTime: new Date().getTime(),
     _version_: 1,
     pf: 'h5',
@@ -85,9 +85,9 @@ async function getRankInfoFromTaoba(config) {
 /**
    * Get pkgroup
    */
-async function _getPkgroupFromTaoba(config) {
+async function _getPkgroupFromTaoba(id, config) {
   const params = {
-    id: config.taoba.taobaPKId,
+    id,
     requestTime: new Date().getTime(),
     _version_: 1,
     pf: 'h5',
@@ -107,8 +107,8 @@ async function _getPkgroupFromTaoba(config) {
 /**
    * Get rank info from Taoba
    */
-async function getPkstatsFromTaoba(config) {
-  const pkgroup = await _getPkgroupFromTaoba(config);
+async function getPkstatsFromTaoba(id, config) {
+  const pkgroup = await _getPkgroupFromTaoba(id, config);
   const params = {
     pkgroup,
     requestTime: new Date().getTime(),

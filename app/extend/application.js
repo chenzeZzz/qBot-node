@@ -201,7 +201,7 @@ module.exports = {
       }
 
 
-      const pkstats = await taobaHttp.getPkstatsFromTaoba(config);
+      const pkstats = await taobaHttp.getPkstatsFromTaoba(taobaId, config);
       let rankIndex = -1;
       pkstats.forEach((item, index) => {
         if (String(item.id) === taobaId) {
@@ -264,7 +264,7 @@ module.exports = {
         );
         return false;
       }
-      const data = await taobaHttp.getJiZiDetail(config);
+      const data = await taobaHttp.getJiZiDetail(taobaId, config);
       const msg =
         `${data.title} \n` +
         ' \n' +

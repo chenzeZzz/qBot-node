@@ -33,7 +33,7 @@ class Taoba extends Subscription {
       return;
     }
 
-    const orderList = await taobaHttp.getRankInfoFromTaoba(this.config);
+    const orderList = await taobaHttp.getRankInfoFromTaoba(taobaId, this.config);
     if (!orderList || !orderList.length) return;
     // 取最新的一条，判断是否为新增.
 
@@ -71,7 +71,7 @@ class Taoba extends Subscription {
     await ctx.service.taoba.savaTaoba(records);
 
     // get donation detail
-    const donationDetail = await ctx.app.getJiZiDetail(this.config);
+    const donationDetail = await taobaHttp.getJiZiDetail(taobaId, this.config);
 
     records.forEach(iterator => {
       if (iterator.addMony > 0) {

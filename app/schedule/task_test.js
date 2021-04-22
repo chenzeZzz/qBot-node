@@ -36,7 +36,7 @@ class UpdateCache extends Subscription {
 
     try {
 
-      const result = await taobaHttp.getRankInfoFromTaoba(config);
+      const result = await taobaHttp.getRankInfoFromTaoba(config.taoba.taobaId, config);
       console.log('result===', result);
     } catch (error) {
       console.log('error===', error);

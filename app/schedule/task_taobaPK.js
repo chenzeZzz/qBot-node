@@ -17,7 +17,6 @@ class TaobaPK extends Subscription {
     };
   }
 
-  // subscribe 是真正定时任务执行时被运行的函数
   async subscribe() {
     const ctx = this;
     const taobaId = this.config.taoba.taobaPKId;
@@ -26,9 +25,8 @@ class TaobaPK extends Subscription {
       return;
     }
 
-    const orderList = await taobaHttp.getRankInfoFromTaoba(this.config);
+    const orderList = await taobaHttp.getRankInfoFromTaoba(taobaId, this.config);
     if (!orderList || !orderList.length) return;
-    // 取最新的一条，判断是否为新增.
 
     const recordInDb = await ctx.service.taoba.getAll(taobaId);
     // { id: 53983,
@@ -62,7 +60,7 @@ class TaobaPK extends Subscription {
     // save db
     await ctx.service.taoba.savaTaoba(records);
 
-    const pkstats = await taobaHttp.getPkstatsFromTaoba(this.config);
+    const pkstats = await taobaHttp.getPkstatsFromTaoba(taobaId, this.config);
     let rankIndex = -1;
     pkstats.forEach((item, index) => {
       if (String(item.id) === taobaId) {
