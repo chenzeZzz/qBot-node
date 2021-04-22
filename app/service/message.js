@@ -77,7 +77,7 @@ class MessageService extends Service {
       case 'IMAGE':
         message.type = '图片';
         // content = '[' + JSON.parse(iterator.bodys).url + '][qq 浏览器白名单会拦截]';
-        message.content = JSON.parse(iterator.bodys).url;
+        message.content = `[CQ:image,file=${JSON.parse(iterator.bodys).url}]`;
         break;
       case 'LIVEPUSH':
         message.type = '直播信息';
@@ -95,7 +95,7 @@ class MessageService extends Service {
             '时间: ' + new Date(iterator.msgTime).toLocaleString().replace(new RegExp('/', 'g'), '-') + '\n' +
             `类型: ${message.showType || message.type} \n` +
             '内容:\n' +
-            `【${message.content}】\n`;
+            `${message.content} \n`;
     return msg;
   }
 }
