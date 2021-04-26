@@ -68,7 +68,7 @@ class MessageService extends Service {
       case 'FLIPCARD':
         // 获取详细内容
         message.type = '翻牌';
-        message.answerTo = await this.ctx.service.http.getAnswerDetail(iterator.extInfo.answerId, iterator.extInfo.questionId);
+        message.answerTo = await this.ctx.service.httpService.getAnswerDetail(iterator.extInfo.answerId, iterator.extInfo.questionId);
         message.question = iterator.extInfo.question;
         message.showType = `回复【${message.answerTo}】的翻牌【${iterator.extInfo.question}】`; // "faipaiUserId":666073
         message.content = `${iterator.extInfo.answer}`;
