@@ -126,7 +126,7 @@ class HttpService extends Service {
     const result = await axios({
       method: 'POST',
       url: this.config.api_48_v2.question_answer,
-      headers: this.config.headers(this.config.pocketToken.imei, token),
+      headers: this.config.headers(this.config.pocketToken.imei || utils.genImei(), token),
       data: { answerId, questionId },
     });
     if (result && result.data.content) {
