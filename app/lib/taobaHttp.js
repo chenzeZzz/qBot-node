@@ -1,9 +1,16 @@
 'use strict';
 const axios = require('axios');
+const url = require('url');
 const HttpsProxyAgent = require('https-proxy-agent');
 
 const utils = require('./utils');
-const httpsAgent = new HttpsProxyAgent('http://forward.xdaili.cn:80');
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+let proxy = 'http://forward.xdaili.cn:80';
+proxy = url.parse(proxy);
+proxy.rejectUnauthorized = false;
+const httpsAgent = new HttpsProxyAgent(proxy);
 
 async function getJiZiDetail(id, config) {
   const params = {
@@ -16,8 +23,7 @@ async function getJiZiDetail(id, config) {
     url: config.taoba.detail,
     headers: config.taoba.headers,
     data: JSON.stringify(params),
-    agent: httpsAgent,
-    rejectUnauthorized: false,
+    httpsAgent,
   });
 
   const data = await utils.decodeData(result.data);
@@ -42,8 +48,7 @@ async function getRankInfoFromTaoba(id, config) {
     url: config.taoba.rankUrl,
     headers: config.taoba.headers,
     data: JSON.stringify(params),
-    agent: httpsAgent,
-    rejectUnauthorized: false,
+    httpsAgent,
   });
 
   const data = await utils.decodeData(result.data);
@@ -69,8 +74,7 @@ async function _getPkgroupFromTaoba(id, config) {
     url: config.taoba.pkDetailUrl,
     headers: config.taoba.headers,
     data: JSON.stringify(params),
-    agent: httpsAgent,
-    rejectUnauthorized: false,
+    httpsAgent,
   });
   const data = await utils.decodeData(result.data);
   if (data.code === 0) {
@@ -94,8 +98,7 @@ async function getPkstatsFromTaoba(id, config) {
     url: config.taoba.pkUrl,
     headers: config.taoba.headers,
     data: JSON.stringify(params),
-    agent: httpsAgent,
-    rejectUnauthorized: false,
+    httpsAgent,
   });
   const data = await utils.decodeData(result.data);
   if (data.code === 0) {
