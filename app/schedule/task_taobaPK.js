@@ -11,7 +11,7 @@ class TaobaPK extends Subscription {
   static get schedule() {
     return {
       disable: process.env.NODE_ENV === 'development',
-      interval: '1m', // 1 分钟间隔
+      interval: '10m', // 1 分钟间隔
       immediate: true,
       type: 'worker', // 指定所有的 worker 都需要执行
     };
