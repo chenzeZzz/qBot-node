@@ -9,8 +9,8 @@ class UpdateCache extends Subscription {
   static get schedule() {
     return {
       disable: process.env.NODE_ENV !== 'development',
-      interval: '10s', // 1 分钟间隔
-      immediate: true,
+      interval: '10m', // 1 分钟间隔
+      immediate: false,
       type: 'worker', // 指定所有的 worker 都需要执行
     };
   }
@@ -25,13 +25,18 @@ class UpdateCache extends Subscription {
     //   {
     //     type: 'image',
     //     data: {
-    //       file: 'kky001',
     //       cache: 0,
-    //       url: 'https://thumbnail0.baidupcs.com/thumbnail/716a601f3g0e386e7424b29ba66ebe46?fid=2876749203-250528-818421839011267&time=1618405200&rt=yt&sign=FDTAER-DCb740ccc5511e5e8fedcff06b081203-8b0MfZONf7kIWgLCz0oKsTKBf2Q%3D&expires=24h&chkv=0&chkbd=0&chkpc=&dp-logid=2095841588&dp-callid=0&size=c200_u200&quality=91&vuk=-&ft=video',
+    //       url: 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2002518753,3591507932&fm=26&gp=0.jpg',
     //     },
     //   },
     // ];
-    // // '[CQ:image,file=kky/haha.image]';
+    const url = 'https://nim.nosdn.127.net/NDA5MzEwOA==/bmltYV83MjUxODEzNzczXzE2MTc4NDYwNDk2MzNfOTZkOWMyZTEtNTlhNi00ZTZlLTg1ZjgtYWU1YWVkM2VkYjNi';
+    // const msg = `[CQ:image,file=${url}]`;
+
+    // const msg =
+    //         '内容:\n' +
+    //         `[CQ:image,file=${url}] \n`;
+
     // this.app.errLog(msg);
 
     try {

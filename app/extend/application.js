@@ -186,12 +186,11 @@ module.exports = {
 
   // 发送 pk 集资信息
   async sendPKInfo(taobaId, keyword) {
-    const client = this.getSocket();
     const config = this.config;
 
     try {
       if (!taobaId) {
-        client.send(
+        this.socket_qbot.send(
           config.genMsg('send_group_msg', {
             group_id: config.group_id,
             message: '目前没有集资活动!',
@@ -231,7 +230,7 @@ module.exports = {
         `集资链接: ${config.target_site_origin + taobaId} \n` +
         `输入 ${keyword} 查看详情`;
 
-      client.send(
+      this.socket_qbot.send(
         config.genMsg('send_group_msg', {
           group_id: config.group_id,
           message: msg,
@@ -256,7 +255,7 @@ module.exports = {
 
     try {
       if (!taobaId) {
-        client.send(
+        this.socket_qbot.send(
           config.genMsg('send_group_msg', {
             group_id: config.group_id,
             message: '目前没有集资活动!',
